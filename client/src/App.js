@@ -1,15 +1,17 @@
 import logo from './logo.svg';
 import './App.css';
 import SignUpComponent from './pages/SignUp';
-import router from './router';
+import AppRouter from './router';
 import { BrowserRouter } from 'react-router-dom';
 import LandingPage from './pages/LandingPage';
+import { AuthContextProvider } from './Authentication';
 
 function App() {
   return (
     <div className="App">
-        <LandingPage />
-        <router />
+      <AuthContextProvider>
+        <AppRouter />
+      </AuthContextProvider>
     </div>
   );
 }
