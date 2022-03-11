@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from "react";
 import { Box, Grid, makeStyles, Modal } from '@mui/material'; 
 import { Button } from '@mui/material';
 import { TextField } from '@mui/material';
@@ -9,37 +9,14 @@ import { useNavigate } from 'react-router-dom';
 import { AuthClass } from '../Authentication';
 import { Typography } from '@mui/material'
 
-// const useStyles = makeStyles(theme => ({
-//     root: {
-//       display: 'flex',
-//       flexDirection: 'column',
-//       justifyContent: 'center',
-//       alignItems: 'center',
-//       padding: theme.spacing(2),
-  
-//       '& .MuiTextField-root': {
-//         margin: theme.spacing(1),
-//         width: '300px',
-//       },
-//       '& .MuiButtonBase-root': {
-//         margin: theme.spacing(2),
-//       },
-//     },
-//   }));
 
-
-function SignUpComponent(props){
-    // const classes = useStyles()
-    const [firstName, setFirstName] = useState('');
-    const [lastName, setLastName] = useState('');
+const LoginPage = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
-    const [confirmedPassword, setConfirmedPassword] = useState('');
-    const [modalVal, setModalVal] = useState('');
+    const[modalVal, setModalVal] = useState('');
     const[showModal, setShowModal] = useState(false);
     const auth = useAuthContext();
     const navigate = useNavigate();
-
     const style = {
         position: 'absolute',
         top: '50%',
@@ -52,54 +29,16 @@ function SignUpComponent(props){
         p: 4,
       }; //From React docs
 
-    const handleOpen = () => setShowModal(true);
-    const handleClose = () => setShowModal(false);
-    // const registerUser = async () =>{
-    //     try{
-    //         const resp = await httpClient.post("//localhost:5000/register",{
-    //             firstName,
-    //             lastName,
-    //             email,
-    //             password
-    //         });
-    //     }catch(error){
-    //         alert("Invalid Credentials");
-    //     }
-    // }
     const emailRegEx = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
 
+    const handleOpen = () => setShowModal(true);
+    const handleClose = () => setShowModal(false);
 
-    return(
+    return (
         <div>
             <Box height= "100vh" flex="1" display="flex" justifyContent="center" alignItems= "center"  >
                 <Grid container direction={"column"} spacing={0.75}  align = "center" justify = "center" alignItems = "center">
-                    <h2>Sign Up</h2>
-                    <Grid item>
-                        <Grid container direction={"row"} spacing={0.5} alignItems="center" flexDirection="row">
-                            <Grid item>
-                                <TextField 
-                                label = "First Name" 
-                                variant = "filled"
-                                placeholder="First Name"
-                                required
-                                value = {firstName}
-                                onChange={e => setFirstName(e.target.value)}
-                                style={{width:150}}
-                                />
-                            </Grid>
-                            <Grid item>
-                                <TextField 
-                                label = "Last Name" 
-                                variant = "filled"
-                                placeholder="Last Name"
-                                required
-                                value = {lastName}
-                                onChange={e=> setLastName(e.target.value)}
-                                style={{width:150}}
-                                />
-                            </Grid>
-                        </Grid>
-                    </Grid>
+                    <h2>Sign In</h2>
                     <Grid item>
                         <TextField 
                             label = "Email" 
@@ -125,37 +64,20 @@ function SignUpComponent(props){
                         style={{width:300}}
                         />
                     </Grid>
-                    <Grid item>
-                        <TextField
-                        label = "Confirm Password"
-                        variant='filled'
-                        required
-                        type="password"
-                        value={confirmedPassword}
-                        onChange = {e => setConfirmedPassword(e.target.value)}
-                        style = {{width:300}}
-                        error={password !== confirmedPassword}
-                        helperText={confirmedPassword !== password ? 'Does not match current password' : ''}
-                        />
-                    </Grid>
                     <Grid item>  
                         <Button variant="contained" color="primary" type='submit' onClick={() =>{
-                            if(password=== ''||confirmedPassword===''||
-                                firstName===''||lastName===''|| email === ''){
+                            if(password=== ''||email === ''){
                                 setModalVal('Please make sure you have filled out all fields.');
-                            setShowModal(true);
-                            }else if(password !== confirmedPassword){
-                                setModalVal('Password does not match confirmed password.');
                                 setShowModal(true);
                             }else if(!email.match(emailRegEx)){
                                 setModalVal('Please enter a valid email.');
                                 setShowModal(true);
                             }else{
-                                if(auth.registerUser(firstName, lastName, email, password)){
+                                if(auth.authenticateUser(email, password)){
                                     navigate('../home')
                                 }
                             }
-                            console.log(auth.registerUser(firstName, lastName, email, password));
+                            console.log(auth.registerUser( email, password));
                         }}>
                             Sign Up
                         </Button>
@@ -178,8 +100,8 @@ function SignUpComponent(props){
                         </Typography>
                     </Box>
             </Modal>
-            </div>
-    );
-};
+        </div>
+    )
+}
 
-export default SignUpComponent;
+export default LoginPage
