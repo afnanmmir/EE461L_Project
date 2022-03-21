@@ -73,11 +73,22 @@ const LoginPage = () => {
                                 setModalVal('Please enter a valid email.');
                                 setShowModal(true);
                             }else{
-                                if(auth.authenticateUser(email, password)){
-                                    navigate('../home')
-                                }
+                                let resp = auth.authenticateUser(email, password);
+                                resp.then((respVal)=>{
+                                    if(respVal.result){
+                                        let response = respVal.response;
+                                        let userEmail = JSON.stringify(response.data.email);
+                                        let token = JSON.stringify(response.data.token);
+                                        auth.setIsAuth(true);
+                                        auth.setUser(userEmail);
+                                        localStorage.setItem("token",token);
+                                        navigate('../home')
+                                    }else{
+                                        setModalVal(respVal.response);
+                                        setShowModal(true);
+                                    }
+                                })
                             }
-                            console.log(auth.registerUser( email, password));
                         }}>
                             Sign Up
                         </Button>

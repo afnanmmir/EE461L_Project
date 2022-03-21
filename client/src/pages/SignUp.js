@@ -3,7 +3,7 @@ import { Box, Grid, makeStyles, Modal } from '@mui/material';
 import { Button } from '@mui/material';
 import { TextField } from '@mui/material';
 import { Container } from '@mui/material';
-import httpClient from '../httpClient';
+import api from '../httpClient';
 import { useAuthContext } from '../Authentication';
 import { useNavigate } from 'react-router-dom';
 import { AuthClass } from '../Authentication';
@@ -143,7 +143,7 @@ function SignUpComponent(props){
                             if(password=== ''||confirmedPassword===''||
                                 firstName===''||lastName===''|| email === ''){
                                 setModalVal('Please make sure you have filled out all fields.');
-                            setShowModal(true);
+                                setShowModal(true);
                             }else if(password !== confirmedPassword){
                                 setModalVal('Password does not match confirmed password.');
                                 setShowModal(true);
@@ -151,11 +151,18 @@ function SignUpComponent(props){
                                 setModalVal('Please enter a valid email.');
                                 setShowModal(true);
                             }else{
-                                if(auth.registerUser(firstName, lastName, email, password)){
-                                    navigate('../home')
-                                }
+                                // console.log("HELLO");
+                                let resp = auth.registerUser(firstName, lastName, email, password);
+                                resp.then((respVal) => {
+                                    if(respVal.result){
+                                        navigate('../')
+                                    }else{
+                                        setModalVal(respVal.response);
+                                        setShowModal(true);
+                                    }
+                                })
                             }
-                            console.log(auth.registerUser(firstName, lastName, email, password));
+                            // console.log(auth.registerUser(firstName, lastName, email, password));
                         }}>
                             Sign Up
                         </Button>
