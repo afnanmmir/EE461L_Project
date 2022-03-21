@@ -1,3 +1,7 @@
+/**
+ * router.js routes each url path to its corresponding component it should render
+ */
+
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 
 import React from 'react'

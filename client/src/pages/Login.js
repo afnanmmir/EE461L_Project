@@ -1,3 +1,7 @@
+/**
+ * Login.js renders the login component of the app
+ */
+
 import React, { useEffect, useState } from "react";
 import { Box, Grid, makeStyles, Modal } from '@mui/material'; 
 import { Button } from '@mui/material';
@@ -11,10 +15,15 @@ import { Typography } from '@mui/material'
 
 
 const LoginPage = () => {
+    // email state that represents what is inputted in the email textfield
     const [email, setEmail] = useState('');
+    // password state that represents what is inputted into the password textfield
     const [password, setPassword] = useState('');
+    // modalVal state that represents what text should be shown by the popup
     const[modalVal, setModalVal] = useState('');
+    // showModal state to represent whether popup should be showing or not.
     const[showModal, setShowModal] = useState(false);
+    // Use the auth object from Authentication.js
     const auth = useAuthContext();
     const navigate = useNavigate();
     const style = {
@@ -28,12 +37,12 @@ const LoginPage = () => {
         boxShadow: 24,
         p: 4,
       }; //From React docs
-
+    // RegEx to check for valid email
     const emailRegEx = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
 
     const handleOpen = () => setShowModal(true);
     const handleClose = () => setShowModal(false);
-
+    // The login components
     return (
         <div>
             <Box height= "100vh" flex="1" display="flex" justifyContent="center" alignItems= "center"  >
@@ -74,8 +83,8 @@ const LoginPage = () => {
                                 setShowModal(true);
                             }else{
                                 let resp = auth.authenticateUser(email, password);
-                                resp.then((respVal)=>{
-                                    if(respVal.result){
+                                resp.then((respVal)=>{ //then is used because auth.authenticateUser is an async function and uses await.
+                                    if(respVal.result){ // if the log in attempt was successful
                                         let response = respVal.response;
                                         let userEmail = JSON.stringify(response.data.email);
                                         let token = JSON.stringify(response.data.token);
@@ -83,7 +92,7 @@ const LoginPage = () => {
                                         auth.setUser(userEmail);
                                         localStorage.setItem("token",token);
                                         navigate('../home')
-                                    }else{
+                                    }else{ // if the login attempt failed
                                         setModalVal(respVal.response);
                                         setShowModal(true);
                                     }

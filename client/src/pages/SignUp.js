@@ -1,3 +1,6 @@
+/**
+ * SignUp.js renders the signing up component of the app
+ */
 import React, { useState } from 'react';
 import { Box, Grid, makeStyles, Modal } from '@mui/material'; 
 import { Button } from '@mui/material';
@@ -30,13 +33,21 @@ import { Typography } from '@mui/material'
 
 function SignUpComponent(props){
     // const classes = useStyles()
+    // firstName state representing input of firstName textfield
     const [firstName, setFirstName] = useState('');
+    // lastName state representing input of lastName textfield
     const [lastName, setLastName] = useState('');
+    // email state representing input of email textfield
     const [email, setEmail] = useState('');
+    // password state representing input of password textfield
     const [password, setPassword] = useState('');
+    // confirmedPassword state representing input of confirmedPassword textfield
     const [confirmedPassword, setConfirmedPassword] = useState('');
+    // modalVal state that represents what text should be shown by the popup
     const [modalVal, setModalVal] = useState('');
+    // showModal state to represent whether popup should be showing or not.
     const[showModal, setShowModal] = useState(false);
+    // Use the auth object from Authentication.js
     const auth = useAuthContext();
     const navigate = useNavigate();
 
@@ -66,6 +77,7 @@ function SignUpComponent(props){
     //         alert("Invalid Credentials");
     //     }
     // }
+    // Checks for a valid email
     const emailRegEx = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
 
 
@@ -141,22 +153,22 @@ function SignUpComponent(props){
                     <Grid item>  
                         <Button variant="contained" color="primary" type='submit' onClick={() =>{
                             if(password=== ''||confirmedPassword===''||
-                                firstName===''||lastName===''|| email === ''){
+                                firstName===''||lastName===''|| email === ''){ // checks for empty fields
                                 setModalVal('Please make sure you have filled out all fields.');
                                 setShowModal(true);
-                            }else if(password !== confirmedPassword){
+                            }else if(password !== confirmedPassword){ //checks for confirmed password being the same as password
                                 setModalVal('Password does not match confirmed password.');
                                 setShowModal(true);
-                            }else if(!email.match(emailRegEx)){
+                            }else if(!email.match(emailRegEx)){ // checks for valid email
                                 setModalVal('Please enter a valid email.');
                                 setShowModal(true);
                             }else{
                                 // console.log("HELLO");
                                 let resp = auth.registerUser(firstName, lastName, email, password);
-                                resp.then((respVal) => {
-                                    if(respVal.result){
+                                resp.then((respVal) => { // then is used because auth.registerUser is an async function and uses await.
+                                    if(respVal.result){ // successful register
                                         navigate('../')
-                                    }else{
+                                    }else{ // unsuccessful register
                                         setModalVal(respVal.response);
                                         setShowModal(true);
                                     }

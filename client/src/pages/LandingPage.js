@@ -1,3 +1,9 @@
+/**
+ * LandingPage.js contains a render of the landing page of the app before logging in and/or signing up.
+ * ALL PAGES USE THE MATERIAL UI: https://mui.com/getting-started/installation/
+ */
+
+
 import React from 'react'
 import { AppBar, Container, Stack } from '@mui/material'
 import { Button } from '@mui/material'
