@@ -1,9 +1,15 @@
 import bcrypt
+from pymongo import MongoClient 
 
 class EncryptionModule:
     """
     Encryption Module class that provides methods to hash and verify passwords as well as 
     store them in our database. 
+
+    Attributes
+    ----------
+    client : MongoClient
+        MongoDB client
 
     Methods
     -------
@@ -15,11 +21,12 @@ class EncryptionModule:
     
     """
 
-    def __init__(self):
+    def __init__(self, mongodb_client):
         """
-        TODO: Will possibly pass MongoDB credentials to init, hence the member variables
-        will possibly those credentials to access the database. 
+        Initializes local variable client which will have a reference to the MongoClient 
         """
+        self.client = mongodb_client
+
 
     def gen_hashed_password_with_salt(self, user_password):
         """
@@ -57,7 +64,49 @@ class EncryptionModule:
         return (hashed_password, salt)
 
 
-    def verify_password(self, user_password, user_name):
+    def store_hashed_password_and_username(self, hashed_password, username):
+        """
+        Stores a hashed password, and username into a MongoDB database
+
+        Parameters
+        ----------
+        hashed_password: string
+            password already encrypted previously by this module
+        
+        username: string
+            username of client
+        
+        Returns
+        -------
+        status: boolean
+        True if sucessful, False otherwise
+        """
+
+        # Form data dictionary
+        user_info = {
+            "username": username,
+            "hashed_pass": hashed_password
+        }
+
+        try:
+            # Obtaining database to which we'll interface
+            users_db = self.client.users
+
+            # Get reference to collection
+            users_info = users_db.users_info
+
+            # Insert user_info dictionary
+            users_info.insert_one(user_info)
+
+        except Exception as e:
+            print("Error while accessing database:\n")
+            print(e)
+            return False
+
+        return True 
+
+
+    def verify_password(self, user_password, username):
         """
         Verifies the password matches the password of the given username
 
@@ -74,19 +123,43 @@ class EncryptionModule:
         status: boolean
         True if password matches the password of the user, False otherwise.
         """        
+
+        try:
+            # Obtain database to which we'll interface
+            users_db = self.client.users
+
+            # Get reference to collection 
+            users_info = users_db.users_info
         
-        # TODO: Obtain the hashed password from MongoDB database using 
-        # the provided user_name
-        hashed_password = b'$2b$12$pZ6LDPosbVuNwFm5w4ugn.4pdfdUUVR6DvpnGGdYbo1Q0Wyu0HYAO'
+        except Exception as e:
+            print("Error while accesing database:\n")
+            print(e)
+            return False
+
+        try:
+            # Obtain the hashed password from MongoDB using the username 
+            # the provided user_name
+            user_info = users_info.find_one({"username": username})
+
+            # Get the hashed password from the user_info dictionary
+            hashed_password = user_info.hashed_pass
         
+        except Exception as e:
+            print("Username does not exist:\n")
+            print(e)
+            return False
+
         # Verify if the user_password matches the hash_password of the user_name obtained
         # from our database
         return bcrypt.checkpw(user_password.encode('utf8'), hashed_password)
 
 
 if __name__ == "__main__":
-    myEncryptMod = EncryptionModule()
+    Client=MongoClient("mongodb+srv://461L_Project:Project_159_461L@cluster0.vuw1b.mongodb.net/users?retryWrites=true&w=majority")
+    myEncryptMod = EncryptionModule(Client)
     password = "TEST"
 
-    print(myEncryptMod.gen_hashed_password_with_salt(password))
-    print(myEncryptMod.verify_password(password, "Erick"))
+    hashed_pass = myEncryptMod.gen_hashed_password_with_salt(password)
+    print(myEncryptMod.store_hashed_password_and_username(hashed_pass, "Erick"))
+
+    #print(myEncryptMod.verify_password(password, "Erick"))
