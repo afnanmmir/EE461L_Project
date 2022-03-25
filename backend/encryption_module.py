@@ -1,6 +1,8 @@
 import bcrypt
 from pymongo import MongoClient 
 
+# TODO: Handle the case of multiple users having the same username
+
 class EncryptionModule:
     """
     Encryption Module class that provides methods to hash and verify passwords as well as 
@@ -31,7 +33,7 @@ class EncryptionModule:
     def gen_hashed_password_with_salt(self, user_password):
         """
         Generates a hashed password using a salt from a user password. Returns
-        a tuple of the generated hashed password and the salt. 
+        hashed password
 
         Parameters
         ----------
@@ -40,9 +42,8 @@ class EncryptionModule:
                 
         Returns
         -------
-        hashed password and salt: (string, string)
-            tuple of hashed password and randomly generated salt. If operation
-            failed, the return tuple is (0, 0)
+        hashed password: string
+            generated hashed password
         """
         
         # If password string is empty, return failed
@@ -61,7 +62,7 @@ class EncryptionModule:
         # Create hashed password from user_password and randomly created salt
         hashed_password = bcrypt.hashpw(user_password.encode('utf8'), salt)
 
-        return (hashed_password, salt)
+        return hashed_password
 
 
     def store_hashed_password_and_username(self, hashed_password, username):
@@ -142,7 +143,7 @@ class EncryptionModule:
             user_info = users_info.find_one({"username": username})
 
             # Get the hashed password from the user_info dictionary
-            hashed_password = user_info.hashed_pass
+            hashed_password = user_info['hashed_pass']
         
         except Exception as e:
             print("Username does not exist:\n")
@@ -154,12 +155,21 @@ class EncryptionModule:
         return bcrypt.checkpw(user_password.encode('utf8'), hashed_password)
 
 
+'''
+THIS MAIN IS FOR TESTING PURPOSES:
+COMMENT OUT ONCE THE MODULE IS READY TO BE USED BY OTHER MODULES
+'''
+
+
+
 if __name__ == "__main__":
     Client=MongoClient("mongodb+srv://461L_Project:Project_159_461L@cluster0.vuw1b.mongodb.net/users?retryWrites=true&w=majority")
+    
     myEncryptMod = EncryptionModule(Client)
     password = "TEST"
 
-    hashed_pass = myEncryptMod.gen_hashed_password_with_salt(password)
-    print(myEncryptMod.store_hashed_password_and_username(hashed_pass, "Erick"))
+    #hashed_pass = myEncryptMod.gen_hashed_password_with_salt(password)
+    #print("hashed pass: " + str(hashed_pass))
+    #myEncryptMod.store_hashed_password_and_username(hashed_pass, "Erick")
 
-    #print(myEncryptMod.verify_password(password, "Erick"))
+    print(myEncryptMod.verify_password(password, "Erick"))
