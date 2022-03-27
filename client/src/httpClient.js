@@ -13,7 +13,7 @@ const api = () =>{
         // console.log(TOKEN);
     }
     let api = axios.create({
-        baseURL:"http://127.0.0.1:5000/",
+        baseURL:"http://127.0.0.1:5000/",// will change when put into production
         responseType:"json"
     });
 

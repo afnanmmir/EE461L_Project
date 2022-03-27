@@ -26,6 +26,17 @@ jwt = JWTManager()
 # from .config import Config
 
 def createApp():
+    """
+    creates the app with all proper configurations and registers all necessary blueprints for use
+
+    Parameters
+    ----------
+    None
+
+    Returns
+    -------
+    Instance of a Flask app.
+    """
     load_dotenv()
     app = Flask(__name__)
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')

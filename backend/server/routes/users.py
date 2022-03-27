@@ -9,12 +9,15 @@ import sys
 
 from database.extensions import mongo
 from util.JSONEncoder import JSONEncoder
+from util.encryption_module import EncryptionModule
 
 users = Blueprint('users', __name__)
 
 encoder = JSONEncoder()
 
+
 database = mongo.db # Gets the database instance of the PyMongo client
+encryption = EncryptionModule(database)
 print(database.list_collection_names())
 user_collection = database['users'] # Accesses the user collection of the databse
 print(user_collection)
@@ -46,14 +49,15 @@ def register():
     user = user_collection.find_one({'email':user_email})
     print(f"User {user}")
     if(user_collection == None):
+        encrypted_password = encryption.gen_hashed_password_with_salt(req['passowrd'])
         doc = {
                 "first_name": req["firstName"],
                 "last_name": req["lastName"],
                 "email": req["email"],
-                "password": req["password"]
+                "password": encrypted_password
             }
         user_collection.insert_one(doc)
-        print("This worked first time!")
+        # print("This worked first time!")
         return {
             'message': "User registered"
         }, 201
@@ -61,11 +65,12 @@ def register():
         if(user):
             return "Account with this email already exists", 409
         else:
+            encrypted_password = encryption.gen_hashed_password_with_salt(req['password'])
             doc = {
                 "first_name": req["firstName"],
                 "last_name": req["lastName"],
                 "email": req["email"],
-                "password": req["password"]
+                "password": encrypted_password
             }
             user_collection.insert_one(doc)
             print("This worked!")
@@ -101,7 +106,7 @@ def login():
             'message': 'User with this email does not yet exist',
             'user_email': '',
         }, 404
-    if(user_password != user['password']):
+    if(not(encryption.verify_password(user_password, user['password']))):
         return {
             'message': 'Password is incorrect',
             'user_email': ''

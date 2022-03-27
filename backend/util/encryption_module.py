@@ -51,7 +51,7 @@ class EncryptionModule:
             return (0, 0)
 
         # Password cannot be more than 72 characters since the bcrypt library
-        # ignores characters after the 72th
+        # ignores characters after the 72nd
         if len(user_password) > 72:
             return (0, 0)
         
@@ -107,7 +107,7 @@ class EncryptionModule:
         return True 
 
 
-    def verify_password(self, user_password, username):
+    def verify_password(self, user_password, hashed_password):
         """
         Verifies the password matches the password of the given username
 
@@ -124,31 +124,31 @@ class EncryptionModule:
         status: boolean
         True if password matches the password of the user, False otherwise.
         """        
+        # TODO: Decide whether we want to access the database from encryption module. Currently, I have the database access in the user route.
+        # try:
+        #     # Obtain database to which we'll interface
+        #     users_db = self.client.users
 
-        try:
-            # Obtain database to which we'll interface
-            users_db = self.client.users
-
-            # Get reference to collection 
-            users_info = users_db.users_info
+        #     # Get reference to collection 
+        #     users_info = users_db.users_info
         
-        except Exception as e:
-            print("Error while accesing database:\n")
-            print(e)
-            return False
+        # except Exception as e:
+        #     print("Error while accesing database:\n")
+        #     print(e)
+        #     return False
 
-        try:
-            # Obtain the hashed password from MongoDB using the username 
-            # the provided user_name
-            user_info = users_info.find_one({"username": username})
+        # try:
+        #     # Obtain the hashed password from MongoDB using the username 
+        #     # the provided user_name
+        #     user_info = users_info.find_one({"username": username})
 
-            # Get the hashed password from the user_info dictionary
-            hashed_password = user_info['hashed_pass']
+        #     # Get the hashed password from the user_info dictionary
+        #     hashed_password = user_info['hashed_pass']
         
-        except Exception as e:
-            print("Username does not exist:\n")
-            print(e)
-            return False
+        # except Exception as e:
+        #     print("Username does not exist:\n")
+        #     print(e)
+        #     return False
 
         # Verify if the user_password matches the hash_password of the user_name obtained
         # from our database
@@ -162,14 +162,14 @@ COMMENT OUT ONCE THE MODULE IS READY TO BE USED BY OTHER MODULES
 
 
 
-if __name__ == "__main__":
-    Client=MongoClient("mongodb+srv://461L_Project:Project_159_461L@cluster0.vuw1b.mongodb.net/users?retryWrites=true&w=majority")
+# if __name__ == "__main__":
+#     Client=MongoClient("mongodb+srv://461L_Project:Project_159_461L@cluster0.vuw1b.mongodb.net/users?retryWrites=true&w=majority")
     
-    myEncryptMod = EncryptionModule(Client)
-    password = "TEST"
+#     myEncryptMod = EncryptionModule(Client)
+#     password = "TEST"
 
-    #hashed_pass = myEncryptMod.gen_hashed_password_with_salt(password)
-    #print("hashed pass: " + str(hashed_pass))
-    #myEncryptMod.store_hashed_password_and_username(hashed_pass, "Erick")
+#     #hashed_pass = myEncryptMod.gen_hashed_password_with_salt(password)
+#     #print("hashed pass: " + str(hashed_pass))
+#     #myEncryptMod.store_hashed_password_and_username(hashed_pass, "Erick")
 
-    print(myEncryptMod.verify_password(password, "Erick"))
+#     print(myEncryptMod.verify_password(password, "Erick"))
