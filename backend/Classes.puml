@@ -1,0 +1,59 @@
+@startuml
+
+title Class Diagrams - Planned Classes
+
+class User {
+  - first_name : string
+  - last_name : string
+  - email : string
+  - hashed_password : bytestring
+  - __init__(first_name, last_name, email, hashed_password)
+  + get_first_name()
+  + get_last_name()
+  + get_email()
+}
+
+class Project{
+  - name: string 
+  - project_description: string
+  - creator : string 
+  - funds : int 
+  - admin_users : list
+  - hardware_sets : list
+  - __init__(name, description, creator, funds, hardware_sets)
+  + get_name()
+  + get_description()
+  + get_creator()
+  + get_funds()
+  + get_admin_users()
+  + check_in(Hardware_Set, quantity)
+  + check_out(Hardware_Set, quantity)
+  + add_funds(amount)
+  + add_user(User)
+}
+
+class Hardware_Set{
+  - name: string
+  - number_hardware_sets : int
+  - funds_per_hardware : int 
+  - __init__(name, number_hardware_sets, funds_per_hardware)
+  + get_name()
+  + get_number_hardware_sets()
+  + get_funds_per_hardware()
+  + check_in(quantity)
+  + check_out(quantity)
+}
+
+class Data_Set{
+  - name: string
+  - authors: list
+  - description : string 
+  - download_link : string 
+  - __init__(name, authors, description, download_link)
+  + get_name()
+  + get_authors()
+  + get_description()
+  + get_download_link()
+}
+
+@enduml
