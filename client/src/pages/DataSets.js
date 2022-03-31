@@ -7,6 +7,11 @@ import TableHead from '@mui/material/TableHead';
 import TableRow from '@mui/material/TableRow';
 import Paper from '@mui/material/Paper';
 import Link from '@mui/material/Link';
+import AppBar from '@mui/material/AppBar'
+import Typography from '@mui/material/Typography'
+import Button from '@mui/material/Button'
+import { Toolbar } from '@mui/material';
+
 
 function createData(name, description, download, carbs, protein) {
   return { name, description, download};
@@ -22,33 +27,42 @@ const rows = [
 
 const DataSet = () => {
     return (
-        <TableContainer component={Paper}>
-          <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
-            <TableHead>
-              <TableRow>
-                <TableCell align="center">Dataset</TableCell>
-                <TableCell align="center">Description</TableCell>
-                <TableCell align="center">Download</TableCell>
+      <div> 
+      <Toolbar position="relative">
+        <a href='/'><Button variant='outlined'>Home</Button></a>
+        <a href='/datasets'><Button variant='outlined'>DataSets</Button></a>
+        <a href='/login'><Button variant='outlined'>Log in</Button></a>
+        <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
+      </Toolbar>
+      <TableContainer component={Paper}>
+        <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
+          <TableHead>
+            <TableRow>
+              <TableCell align="center">Dataset</TableCell>
+              <TableCell align="center">Description</TableCell>
+              <TableCell align="center">Download</TableCell>
+            </TableRow>
+          </TableHead>
+          <TableBody>
+            {rows.map((row) => (
+              <TableRow
+                key={row.name}
+                sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
+              >
+                <TableCell component="th" scope="row">
+                  {row.name}
+                </TableCell>
+                <TableCell align="right">{row.description}</TableCell>
+                <TableCell align="right">
+                  <Link href={row.download}> ZIP file </Link>
+                </TableCell>
               </TableRow>
-            </TableHead>
-            <TableBody>
-              {rows.map((row) => (
-                <TableRow
-                  key={row.name}
-                  sx={{ '&:last-child td, &:last-child th': { border: 0 } }}
-                >
-                  <TableCell component="th" scope="row">
-                    {row.name}
-                  </TableCell>
-                  <TableCell align="right">{row.description}</TableCell>
-                  <TableCell align="right">
-                    <Link href={row.download}> ZIP file </Link>
-                  </TableCell>
-                </TableRow>
-              ))}
-            </TableBody>
-          </Table>
-        </TableContainer>
+            ))}
+          </TableBody>
+        </Table>
+      </TableContainer>
+      </div>
+        
       );
   }
 

@@ -12,6 +12,7 @@ import { useAuthContext } from '../Authentication';
 import { useNavigate } from 'react-router-dom';
 import { AuthClass } from '../Authentication';
 import { Typography } from '@mui/material'
+import { Toolbar } from "@mui/material";
 
 
 const LoginPage = () => {
@@ -45,6 +46,12 @@ const LoginPage = () => {
     // The login components
     return (
         <div>
+            <Toolbar position="relative">
+                <a href='/'><Button variant='outlined'>Home</Button></a>
+                <a href='/datasets'><Button variant='outlined'>DataSets</Button></a>
+                <a href='/login'><Button variant='outlined'>Log in</Button></a>
+                <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
+            </Toolbar>
             <Box height= "100vh" flex="1" display="flex" justifyContent="center" alignItems= "center"  >
                 <Grid container direction={"column"} spacing={0.75}  align = "center" justify = "center" alignItems = "center">
                     <h2>Sign In</h2>
