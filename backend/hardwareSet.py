@@ -4,9 +4,11 @@ class HWSet:
     Availability = 0
     CheckedOut = 0
 
-    def __init__(self, qty):
+    def __init__(self, id, qty, Cost_per_hardware):
+        self.id = id
         self.Capacity = qty
         self.Availability = qty
+        self.Cost_per_hardware = Cost_per_hardware
 
     def get_availability(self):
         return self.Availability
@@ -18,16 +20,29 @@ class HWSet:
         return self.CheckedOut
 
     def check_out(self, qty):
-        if(qty > self.Availability): # Return an error if the qty is too large
-            self.CheckedOut += self.Availability
+        if(qty > self.Availability): # Return the amount checked out
+            
+            actual_qty_checked_out = self.Availability
+            self.CheckedOut += actual_qty_checked_out
             self.Availability = 0
-            return -1
+
+            return actual_qty_checked_out
+
         self.CheckedOut += qty
         self.Availability -= qty
-        return 0
+        return qty
 
     def check_in(self, qty):
+        # Increase availability by qty
         self.Availability += qty
+
         if(self.Availability > self.Capacity):
+            # Calculate the actual quantity we were able to checked in
+            actual_qty_checked_in = qty - (self.Availability - self.Capacity)
+            # Set availability to capacity
             self.Availability = self.Capacity
+            # Return the actual checked in qty
+            return actual_qty_checked_in
+        else:
+            return qty
     
