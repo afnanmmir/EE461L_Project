@@ -1,5 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
+import Projects from './pages/Projects';
+import CreateProject from './components/CreateProject';
+
 import SignUpComponent from './pages/SignUp';
 import AppRouter from './router';
 import { BrowserRouter } from 'react-router-dom';
