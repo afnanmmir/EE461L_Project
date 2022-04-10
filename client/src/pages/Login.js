@@ -98,7 +98,7 @@ const LoginPage = () => {
                                         auth.setIsAuth(true);
                                         auth.setUser(userEmail);
                                         localStorage.setItem("token",token);
-                                        navigate('../home')
+                                        navigate('../projects')
                                     }else{ // if the login attempt failed
                                         setModalVal(respVal.response);
                                         setShowModal(true);

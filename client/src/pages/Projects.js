@@ -25,6 +25,8 @@ const Projects = () => {
     const handleOpenDialog = () => setShowDialog(true);
     const handleCloseDialog = () => setShowDialog(false);
 
+    const navigate = useNavigate();
+
     const userEmail = "afnan@gmail.com";
     const userFirstName = "Afnan";
     const userLastName = "Mir";
@@ -139,11 +141,11 @@ const Projects = () => {
             <Box sx={{ flexGrow: 1 }}>
                 <AppBar position="relative">
                     <Toolbar>
-                        <Typography variant="h6" component="div" sx={{ flexGrow:1 }}>
+                        <Typography variant="h6" component="div" align="left" sx={{ flexGrow:1 }}>
                             Welcome {`${userFirstName} ${userLastName}`}
                         </Typography>
                         <Button color="inherit">Projects</Button>
-                        <Button color="inherit">Datasets</Button>
+                        <Button color="inherit" href="../datasets">DataSets</Button>
                         <Button color="inherit">Logout</Button>
                     </Toolbar>
                 </AppBar>

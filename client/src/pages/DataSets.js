@@ -10,7 +10,7 @@ import Link from '@mui/material/Link';
 import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
-import { Toolbar } from '@mui/material';
+import { Toolbar, Box } from '@mui/material';
 
 
 function createData(name, description, download, carbs, protein) {
@@ -26,14 +26,23 @@ const rows = [
 ];
 
 const DataSet = () => {
+    const userEmail = "afnan@gmail.com";
+    const userFirstName = "Afnan";
+    const userLastName = "Mir";
     return (
       <div> 
-      <Toolbar position="relative">
-        <a href='/'><Button variant='outlined'>Home</Button></a>
-        <a href='/datasets'><Button variant='outlined'>DataSets</Button></a>
-        <a href='/login'><Button variant='outlined'>Log in</Button></a>
-        <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
-      </Toolbar>
+      <Box sx={{ flexGrow: 1 }}>
+          <AppBar position="relative">
+              <Toolbar>
+                  <Typography variant="h6" component="div" align='left' sx={{ flexGrow:1 }}>
+                      Welcome {`${userFirstName} ${userLastName}`}
+                  </Typography>
+                  <Button color="inherit" href='../projects'>Projects</Button>
+                  <Button color="inherit" href="../datasets">DataSets</Button>
+                  <Button color="inherit">Logout</Button>
+              </Toolbar>
+          </AppBar>
+        </Box>
       <TableContainer component={Paper}>
         <Table sx={{ minWidth: 650 }} size="small" aria-label="a dense table">
           <TableHead>

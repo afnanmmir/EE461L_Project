@@ -9,6 +9,7 @@ import LandingPage from "./pages/LandingPage";
 import SignUpComponent from "./pages/SignUp";
 import LoginPage from "./pages/Login";
 import DataSet from "./pages/DataSets";
+import Projects from "./pages/Projects";
 
 const AppRouter = () => {
   return (
@@ -18,7 +19,7 @@ const AppRouter = () => {
             <Route exact path="/datasets" element={<DataSet />}/>
             <Route exact path="/register" element={<SignUpComponent />}/>
             <Route exact path="/login" element={<LoginPage />}></Route>
-            
+            <Route exact path="/projects" element={<Projects />}></Route>
         </Routes> 
       </BrowserRouter>     
   );
