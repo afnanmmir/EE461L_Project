@@ -20,6 +20,6 @@ class JSONEncoder(json.JSONEncoder):
         -------
         Encoded version of the field.
         """
-        if isinstance(o, ObjectId):
+        if isinstance(o, ObjectId) or isinstance(o,bytes):
             return str(o)
         return json.JSONEncoder.default(self, o)

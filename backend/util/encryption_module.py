@@ -163,6 +163,8 @@ COMMENT OUT ONCE THE MODULE IS READY TO BE USED BY OTHER MODULES
 
 
 # if __name__ == "__main__":
+#     Client=MongoClient("mongodb+srv://461L_Project:Project_159_461L@cluster0.vuw1b.mongodb.net/users?retryWrites=true&w=majority")
+    
 #     myEncryptMod = EncryptionModule(Client)
 #     password = "TEST"
 
