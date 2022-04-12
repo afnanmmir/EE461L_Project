@@ -18,9 +18,7 @@ encoder = JSONEncoder()
 
 database = mongo.db # Gets the database instance of the PyMongo client
 encryption = EncryptionModule(database)
-print(database.list_collection_names())
 user_collection = database['users'] # Accesses the user collection of the databse
-print(user_collection)
 
 
 
