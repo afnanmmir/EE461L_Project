@@ -6,21 +6,17 @@ from flask_jwt_extended import create_access_token
 
 import sys
 
-
-from database.extensions import mongo
-from util.JSONEncoder import JSONEncoder
-from util.encryption_module import EncryptionModule
+from backend.database.extensions import mongo
+from backend.util.JSONEncoder import JSONEncoder
+from backend.util.encryption_module import EncryptionModule
 
 users = Blueprint('users', __name__)
 
 encoder = JSONEncoder()
 
-
 database = mongo.db # Gets the database instance of the PyMongo client
 encryption = EncryptionModule(database)
-user_collection = database['users'] # Accesses the user collection of the databse
-
-
+user_collection = database.users # Accesses the user collection of the databse
 
 
 @users.route('/register', methods=["POST"])
@@ -44,7 +40,12 @@ def register():
     """
     req = request.get_json()
     user_email = req['email']
-    user = user_collection.find_one({'email':user_email})
+
+    print(mongo, file=sys.stderr)
+    print(database, file=sys.stderr)
+    print(user_collection.find(), file=sys.stderr)
+    user = user_collection.find_one()
+    '''
     print(f"User {user}")
     if(user_collection == None):
         encrypted_password = encryption.gen_hashed_password_with_salt(req['passowrd'])
@@ -73,6 +74,10 @@ def register():
             user_collection.insert_one(doc)
             print("This worked!")
             return {
+                'message': "User registered"
+            }, 201
+    '''
+    return {
                 'message': "User registered"
             }, 201
 

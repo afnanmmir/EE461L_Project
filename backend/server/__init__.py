@@ -16,15 +16,26 @@ from flask import Flask
 from dotenv import load_dotenv
 import os
 import datetime
-from database.extensions import * #import the database from database directory
+from backend.database.extensions import * #import the database from database directory
 from flask_cors import CORS # Import CORS class
 from flask_jwt_extended import JWTManager # Import JWTManager Class
+import sys
 
 cors = CORS()
 jwt = JWTManager()
 
 # from .config import Config
+"""
+creates the app with all proper configurations and registers all necessary blueprints for use
 
+Parameters
+----------
+None
+
+Returns
+-------
+Instance of a Flask app.
+"""
 def createApp():
     """
     creates the app with all proper configurations and registers all necessary blueprints for use

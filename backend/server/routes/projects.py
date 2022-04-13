@@ -13,7 +13,12 @@ projects = Blueprint('projects', __name__)
 
 encoder = JSONEncoder()
 
-database = mongo.db
+# Get database instance of the pymongo client
+database = mongo.db 
+# Accesses the projects collection of the database
+projects_collection = database('projects')
+# Accesses the user collection of the database
+user_collection = database('users')
 
 @projects.route("/", methods=["POST"])
 def create_project():
@@ -42,8 +47,21 @@ def create_project():
     422: Error in creating the project
 
     """
+    req = request.get_json()
+    
+    project_name = req['name']
+    user_creator = req['creator']
+    description = req['description']
+    funds = req['funds']
+    users = req['users']
+    hw_sets = req['HWSets']
+
+    # Get user's email
+    user = user_collection.find_one({'user':user_creator})
     # Function should give a unique id for the project being created. Would be named 'userEmail_projectName'
+    print(user['email'])
     # Function should check to make sure project of given name has not already been created by the user
+    
     return
 
 @projects.route("/", methods=["GET"])
