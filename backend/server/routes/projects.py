@@ -22,6 +22,15 @@ def create_project():
 
     Allows user to create a new project. Project will have attributes such as 
     an id, creator, members, funds, hardware sets...
+    Format of Project:
+    {
+        id: <string>,
+        creator: <string>,
+        description: <string>,
+        funds: <int>,
+        users: <list>,
+        HWSets: <list>
+    }
 
     Parameters
     ----------
@@ -33,6 +42,8 @@ def create_project():
     422: Error in creating the project
 
     """
+    # Function should give a unique id for the project being created. Would be named 'userEmail_projectName'
+    # Function should check to make sure project of given name has not already been created by the user
     return
 
 @projects.route("/", methods=["GET"])
@@ -40,7 +51,7 @@ def get_projects():
     """
     GET projects/
 
-    Returns all the projects in the database
+    Returns all the projects in the database FROM THE USER
 
     Parameters
     ----------
@@ -51,6 +62,8 @@ def get_projects():
     200: All the projects
     
     """
+    # Should only return projects of the current user.
+    # The get request should contain a json with the email of the current user ({'user': userEmail})
     return
 
 @projects.route("/checkout/<id>", methods=["PUT"])
@@ -67,7 +80,7 @@ def project_checkout(id):
 
     Parameters
     ----------
-    id : ? (unknown type at the moment)
+    id : string
     - the id of the project you want to update
 
     Returns
@@ -93,7 +106,7 @@ def project_checkin(id):
 
     Parameters
     ----------
-    id : ? (unknown type at the moment)
+    id : String
     - the id of the project you want to update
 
     Returns
@@ -121,7 +134,7 @@ def project_update_members(id):
 
     Parameters
     ----------
-    id : ? (unknown type at the moment)
+    id : String
     - the id of the project you want to update
 
     Returns
