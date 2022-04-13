@@ -6,10 +6,11 @@ import { Container } from '@mui/material';
 // import httpClient from '../httpClient';
 // import { useAuthContext } from '../Authentication';
 import { useNavigate } from 'react-router-dom';
-// import { AuthClass } from '../Authentication';
+import { AuthClass, useAuthContext } from '../Authentication';
 import { Typography } from '@mui/material'
 import CreateProject from "../components/CreateProject";
 import ProjectTable from "../components/ProjectTable";
+import api from "../httpClient";
 
 const Projects = () => {
     const [allProjects, setAllProjects] = useState([]);
@@ -26,10 +27,23 @@ const Projects = () => {
     const handleCloseDialog = () => setShowDialog(false);
 
     const navigate = useNavigate();
+    const auth = useAuthContext();
 
-    const userEmail = "afnan@gmail.com";
-    const userFirstName = "Afnan";
-    const userLastName = "Mir";
+    const getUserProjects = () => {
+        api().get("/projects", {
+            user: auth.user
+        }).then((response) => {
+            setAllProjects(response.data);
+        }).catch((e)=>{
+            console.log(e);
+        });
+    }
+
+    // const d
+
+    const userEmail = auth.user;
+    // const userFirstName = "Afnan";
+    // const userLastName = "Mir";
     const hardwareSets = [
         {
             _id: 1,
@@ -57,13 +71,12 @@ const Projects = () => {
     }
 
     const deleteProject = (project) => {
-        let newProjects = [];
-        for (let index = 0; index < allProjects.length; index++) {
-            if(allProjects[index].name !== project.name){
-                newProjects.push(allProjects[index]);
-            }
-        }
-        setAllProjects(newProjects)
+        let id = project._id;
+        api().delete("/projects/" + id).then((response) => {
+            props.getAllProjects();
+        }).catch((e) => {
+            console.log(e);
+        })
     }
 
     const renderHWSetsTable = () =>{
@@ -142,7 +155,7 @@ const Projects = () => {
                 <AppBar position="relative">
                     <Toolbar>
                         <Typography variant="h6" component="div" align="left" sx={{ flexGrow:1 }}>
-                            Welcome {`${userFirstName} ${userLastName}`}
+                            Welcome {`${userEmail}`}
                         </Typography>
                         <Button color="inherit">Projects</Button>
                         <Button color="inherit" href="../datasets">DataSets</Button>
@@ -153,7 +166,7 @@ const Projects = () => {
             <Box>
                 <Grid container direction={"row"} spacing={2}>
                     <Grid item xs={4}>
-                        <CreateProject projects={allProjects} addProjects={setAllProjects} user={userEmail}/>
+                        <CreateProject projects={allProjects} getAllProjects={getUserProjects} user={userEmail}/>
                     </Grid>
                     <Grid item xs={8} style={{textAlign: "center"}}>
                         <Box>

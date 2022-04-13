@@ -8,6 +8,8 @@ import { Container } from '@mui/material';
 import { useNavigate } from 'react-router-dom';
 // import { AuthClass } from '../Authentication';
 import { Typography } from '@mui/material'
+import { useAuthContext } from '../Authentication';
+import api from "../httpClient"
 // import { makeStyles } from "@mui/styles"
 
 // const useStyles = makeStyles(theme =>({
@@ -24,17 +26,30 @@ const CreateProject = (props) => {
     const [projectDescription, setProjectDescription] = useState("");
     const [projectFunds, setProjectFunds] = useState("");
 
+    const auth = useAuthContext();
+
     const handleSubmit = () => {
         if(projectName === "" || projectDescription === "" || projectFunds ===""){
-            alert("Please fill out all fields,")
+            alert("Please fill out all fields.")
         }else{
             let newProject = {
                 name: projectName,
+                creator: props.user,
                 description: projectDescription,
-                funds: projectFunds
+                funds: projectFunds,
+                users: [props.user],
+                HWSets: []
             };
-            console.log("made it here");
-            props.addProjects(props.projects.concat(newProject));
+            api().post("/projects",newProject).then((response) => {
+                if(response.data.success){
+                    props.getAllProjects();
+                }
+            }).catch((e) => {
+                console.log(e);
+            });
+            
+            // props.addProjects(props.projects.concat(newProject));
+
         }
     }
   return (
@@ -80,21 +95,10 @@ const CreateProject = (props) => {
             </Grid>
             <Grid item>
                 <Button onClick={() => {
-                    if(projectName === "" || projectDescription === "" || projectFunds ===""){
-                        alert("Please fill out all fields,")
-                     }else{
-                    let newProject = {
-                        name: projectName,
-                        creator: props.user,
-                        description: projectDescription,
-                        funds: projectFunds,
-                        users: [props.user],
-                        HWSets: []
-                    };
-                    console.log("made it here");
-                    props.addProjects(props.projects.concat(newProject));
-                    }}}>
-            Create New Project</Button>
+                    handleSubmit();
+                }}>
+                    Create New Project
+                </Button>
             </Grid>
         </Grid>
     </Paper>
