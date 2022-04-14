@@ -19,12 +19,9 @@ projects_collection = database["projects"]
 user_collection = database['users']
 hardware_collection = database['hardware']
 
-# TODO: Determine if the id of the projects is even needed since we can maybe just use their name
-# TODO: Check if maybe it's better to pass an email as 'creator' of project instead of firstname
 # TODO: In POST methods, verify the format of the inputted data is correct, right now we are just assuming
 #       it will be correct. For instance, HWSets need to be a dictionary with key as the name of the set and 
 #       value is the amount 
-# TODO: Determine what we'll use as 'user' in several places, is it firstname, lastname? combination? the email?
 
 @projects.route("/", methods=["POST"])
 def create_project():
