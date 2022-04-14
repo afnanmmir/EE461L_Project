@@ -207,22 +207,22 @@ def project_checkout(id):
 
     # Check this hardware set exists in the hardware database, it must exist
     if hw_set == None:
-        return {"message": "Hardware Set Not Found in Database"}, 404
+        return {"message": "Hardware set not found in hardware database"}, 404
 
-    # Modify hw_sets dictionary based on given data
-    for hw_set_key in hw_sets:
-        if hw_set_key == hw_set_name:
-            # Calculte the new amount of items available of this hw set
-            new_available = hw_set['available'] - amount
+    # Calculte the new amount of items available of this hw set
+    new_available = hw_set['available'] - amount
 
-            if new_available < 0:
-                # If the new available amount is less than 0, we tried to withdraw more than available
-                # so we only withdraw whatever is left
-                new_available = 0
-                checked_out = hw_set['available']
+    if new_available < 0:
+        # If the new available amount is less than 0, we tried to withdraw more than available
+        # so we only withdraw whatever is left
+        new_available = 0
+        checked_out = hw_set['available']
 
-            # Set the new amount in the dictionary for this hw set
-            hw_sets[hw_set_name] = hw_sets[hw_set_name] + checked_out
+    # Set the new amount in the dictionary for this hw set
+    hw_sets[hw_set_name] = hw_sets[hw_set_name] + checked_out
+
+    # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
+    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
 
     # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
@@ -233,8 +233,6 @@ def project_checkout(id):
         {"HWSetName": hw_set_name},
         {"$set": {"checked_out": hw_set['checked_out'] + checked_out}},
     )
-    # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new available amount
-    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
 
     # Return success message
     return {"message": "Project has been successfully updated"}, 201
@@ -267,7 +265,56 @@ def project_checkin(id):
     # Function requirements:
     # Function should check to make sure the project has resources to check in from the specified hardware set
     # Function should check to make sure project has checked in a valied amount of resources.
-    return
+
+    # Format the input to json
+    req = request.get_json()
+    hw_set_name = req["HWSetName"]
+    amount = req["amount"]
+
+    # Verify a project with such id exits
+    project = projects_collection.find_one({"id": id})
+
+    if project == None:
+        return {"message": "Project not found"}, 404
+
+    hw_sets = project["hw_sets"]
+
+    # Verify the project already has this hw set on its list
+    if hw_set_name not in hw_sets: 
+        return {"message": "Hardware set not found in project list"}, 404
+    
+    currently_checked_out = hw_sets[hw_set_name]
+
+    # If we are trying to check in more than what we have checked out, return error
+    if amount > currently_checked_out:
+        return {"message": "Error in updating the project. Attempted to check in more than amount checked out."}, 422
+    
+    new_checked_out = currently_checked_out - amount
+
+    # Update hw_set dictionary in projects, we subtract to the checked out amounts
+    hw_sets[hw_set_name] = new_checked_out
+
+    # Verify hw set was found in database
+    hw_set = hardware_collection.find_one({"HWSetName":hw_set_name})
+    
+    if hw_set == None:
+        return {"message": "Hardware set not found in hardware database"}, 404
+    
+     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
+    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
+
+     # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
+    hardware_collection.update_one(
+        {"HWSetName": hw_set_name},
+        {"$set": {"available": hw_set['available'] + amount}},
+    )
+    hardware_collection.update_one(
+        {"HWSetName": hw_set_name},
+        {"$set": {"checked_out": hw_set['checked_out'] - amount}},
+    )
+
+    # Return success message
+    return {"message": "Project has been successfully updated"}, 201
 
 
 @projects.route("/members/<id>", methods=["PUT"])
