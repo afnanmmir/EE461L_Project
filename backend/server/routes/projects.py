@@ -213,7 +213,7 @@ def project_checkout(id):
     hardware_collection.update_one({'HWSetName':hw_set_name}, {"$set": {'checked_out': currently_checked_out + checked_out}})
 
     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new available amount
-    projects_collection.update_one({'id':id}, {"$set": {'HWSets':hw_sets}})
+    projects_collection.update_one({'id':id}, {"$set": {'hw_sets':hw_sets}})
 
     # Return success message
     return {
