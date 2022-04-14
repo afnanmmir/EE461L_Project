@@ -19,8 +19,9 @@ user_collection = database["users"]
 hardware_collection = database["hardware"]
 
 # TODO: In POST methods, verify the format of the inputted data is correct, right now we are just assuming
-#       it will be correct. For instance, HWSets need to be a dictionary with key as the name of the set and 
-#       value is the amount 
+#       it will be correct. For instance, HWSets need to be a dictionary with key as the name of the set and
+#       value is the amount
+
 
 @projects.route("/", methods=["POST"])
 def create_project():
@@ -138,14 +139,14 @@ def get_projects():
         # No user was found in database, return error
         return {"message": "Error, no user found"}, 422
     # print(user, file=sys.stderr)
-    userName = user["first_name"]
+    # userName = user["first_name"]
 
     # Creates list of all projects with the user's name in the users field
     project_list = []
 
     for p in projects_collection.find():
         userArray = p["users"]
-        if userName in userArray or userName.lower() in userArray:
+        if userEmail in userArray:
             p_temp = p.copy()
             del p_temp["_id"]
             print(project_list, file=sys.stderr)
@@ -232,7 +233,7 @@ def project_checkout(id):
     )
 
     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new available amount
-    projects_collection.update_one({'id':id}, {"$set": {'hw_sets':hw_sets}})
+    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
 
     # Return success message
     return {"message": "Project has been successfully updated"}, 201
@@ -314,17 +315,40 @@ def project_update_members(id):
             # No user was found in database, return error
             return {"message": "Error in updating the project, no user found"}, 422
 
-        # Proceed to add the user, get its name first
-        first_name = user["first_name"]
+        # Proceed to add the user
+        userEmail = user["email"]
 
         # Get list of users from project
         project = projects_collection.find_one({"id": id})
+        userList = project["users"].copy()
+        if userEmail in userList:
+            return {"message": "User already in project"}, 422
 
+        userList.append(userEmail)
+        projects_collection.update_one({"id": id}, {"$set": {"users": userList}})
+
+        return {"message": "User successfully added"}, 201
     else:
         # We are removing a user
-        return
+        # verify the user exist in the database
+        user = user_collection.find_one({"email": user_email})
 
-    return
+        if user == None:
+            # No user was found in database, return error
+            return {"message": "Error in updating the project, no user found"}, 422
+
+        # Proceed to delete the use
+        userEmail = user["email"]
+
+        # Get list of users from project
+        project = projects_collection.find_one({"id": id})
+        userList = project["users"].copy()
+        if userEmail in userList:
+            userList.remove(userEmail)
+            projects_collection.update_one({"id": id}, {"$set": {"users": userList}})
+            return {"message": "User removed from project"}, 201
+        else:
+            return {"message": "User is not in the project"}, 422
 
 
 @projects.route("/<id>", methods=["DELETE"])
