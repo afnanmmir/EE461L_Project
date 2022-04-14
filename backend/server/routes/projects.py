@@ -1,3 +1,4 @@
+from tabnanny import check
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token
 from flask import jsonify
@@ -194,43 +195,43 @@ def project_checkout(id):
 
     hw_sets = project["hw_sets"]
 
-    # Modify hw_sets dictionary based on given data
+    # If this hardware set hadn't been checked out before in this project we init to 0 here
+    if hw_set_name not in hw_sets:
+        hw_sets[hw_set_name] = 0
+
     checked_out = amount
 
-    for hw_set_key in hw_sets:
-        if hw_set_key == hw_set_name:
-            # Calculte the new amount of items available of this hw set
-            new_amount = hw_sets[hw_set_name] - amount
-
-            if new_amount < 0:
-                # If the new amount is less than 0, we tried to withdraw more than available
-                # so we only withdraw whatever is left
-                new_amount = 0
-                checked_out = hw_sets[hw_set_name]
-
-            # Set the new amount in the dictionary for this hw set
-            hw_sets[hw_set_name] = new_amount
-
-    # Update the hardware collection database
+     # Get hardawre set document from hardware collection
     hw_set = hardware_collection.find_one({"HWSetName": hw_set_name})
 
     # Check this hardware set exists in the hardware database, it must exist
     if hw_set == None:
         return {"message": "Hardware Set Not Found in Database"}, 404
 
-    currently_available = hw_set["available"]
-    currently_checked_out = hw_set["checked_out"]
+    # Modify hw_sets dictionary based on given data
+    for hw_set_key in hw_sets:
+        if hw_set_key == hw_set_name:
+            # Calculte the new amount of items available of this hw set
+            new_available = hw_set['available'] - amount
+
+            if new_available < 0:
+                # If the new available amount is less than 0, we tried to withdraw more than available
+                # so we only withdraw whatever is left
+                new_available = 0
+                checked_out = hw_set['available']
+
+            # Set the new amount in the dictionary for this hw set
+            hw_sets[hw_set_name] = hw_sets[hw_set_name] + checked_out
 
     # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
         {"HWSetName": hw_set_name},
-        {"$set": {"available": currently_available - checked_out}},
+        {"$set": {"available": new_available}},
     )
     hardware_collection.update_one(
         {"HWSetName": hw_set_name},
-        {"$set": {"checked_out": currently_checked_out + checked_out}},
+        {"$set": {"checked_out": hw_set['checked_out'] + checked_out}},
     )
-
     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new available amount
     projects_collection.update_one({'id':id}, {"$set": {'hw_sets':hw_sets}})
 
