@@ -1,4 +1,5 @@
 from crypt import methods
+from curses.ascii import NUL
 from flask import Blueprint, request
 from flask_jwt_extended import create_access_token
 
@@ -16,8 +17,15 @@ encoder = JSONEncoder()
 database = mongo.db
 projects_collection = database["projects"]
 user_collection = database['users']
+hardware_collection = database['hardware']
 
+# TODO: Determine if the id of the projects is even needed since we can maybe just use their name
 # TODO: Check if maybe it's better to pass an email as 'creator' of project instead of firstname
+# TODO: In POST methods, verify the format of the inputted data is correct, right now we are just assuming
+#       it will be correct. For instance, HWSets need to be a dictionary with key as the name of the set and 
+#       value is the amount 
+# TODO: Determine what we'll use as 'user' in several places, is it firstname, lastname? combination? the email?
+
 @projects.route("/", methods=["POST"])
 def create_project():
     """
@@ -25,14 +33,18 @@ def create_project():
 
     Allows user to create a new project. Project will have attributes such as 
     an id, name, creator, members, funds, hardware sets...
+    
     Format of Project:
     {
+        id: <string>
         name: <string>,
         creator: <string>,
         description: <string>,
         funds: <int>,
         users: <list>,
-        HWSets: <list>
+        HWSets: <dictionary> 
+                key: HWSet
+                value: Amount
     }
 
     Parameters
@@ -120,6 +132,7 @@ def get_projects():
     200: All the projects
     
     """
+    # Function requirements:
     # Should only return projects of the current user.
     # The get request should contain a json with the email of the current user ({'user': userEmail})
     return
@@ -133,7 +146,7 @@ def project_checkout(id):
     JSON Format:
     {
         'HWSetName': <name>,
-        'Amount': <amount>
+        'amount': <amount>
     }
 
     Parameters
@@ -149,12 +162,63 @@ def project_checkout(id):
     
     """
 
-    # We are assumingthat the id parameter of the project has format userEmail_projectName
+    # NOTE: We are assumingthat the id parameter of the project has format userEmail_projectName
 
+    # Format the input to json
+    req = request.get_json()
+    hw_set_name = req['HWSetName']
+    amount = req['amount']
+    
     # Verify a project with such id exits
+    project = projects_collection.find_one({"id":id})
+    
+    if project == None:
+        return {
+            'message': "Project not found"
+        }, 404
 
-    # Get all current data of project
-    return
+    hw_sets = project['hw_sets']
+
+    # Modify hw_sets dictionary based on given data
+    checked_out = amount
+
+    for hw_set_key in hw_sets:
+        if hw_set_key == hw_set_name:
+            # Calculte the new amount of items available of this hw set
+            new_amount = hw_sets[hw_set_name] - amount
+            
+            if new_amount < 0:
+                # If the new amount is less than 0, we tried to withdraw more than available
+                # so we only withdraw whatever is left
+                new_amount = 0
+                checked_out = hw_sets[hw_set_name]
+
+            # Set the new amount in the dictionary for this hw set
+            hw_sets[hw_set_name] = new_amount 
+        
+    # Update the hardware collection database
+    hw_set = hardware_collection.find_one({'HWSetName':hw_set_name})
+    
+    # Check this hardware set exists in the hardware database, it must exist
+    if hw_set == None:
+        return {
+            'message': "Hardware Set Not Found in Database"
+        }, 404
+
+    currently_available = hw_set['available']
+    currently_checked_out = hw_set['checked_out']
+
+    # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
+    hardware_collection.update_one({'HWSetName':hw_set_name}, {"$set": {'available': currently_available - checked_out}})
+    hardware_collection.update_one({'HWSetName':hw_set_name}, {"$set": {'checked_out': currently_checked_out + checked_out}})
+
+    # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new available amount
+    projects_collection.update_one({'id':id}, {"$set": {'HWSets':hw_sets}})
+
+    # Return success message
+    return {
+        'message': "Project has been successfully updated"
+    }, 201
 
 @projects.route("/checkin/<id>", methods=["PUT"])
 def project_checkin(id):
@@ -184,6 +248,7 @@ def project_checkin(id):
     # Function should check to make sure the project has resources to check in from the specified hardware set
     # Function should check to make sure project has checked in a valied amount of resources.
     
+
     
     return
 
@@ -196,7 +261,7 @@ def project_update_members(id):
     JSON Format:
     {
         'add_or_remove': <string>,
-        'user': <user>
+        'user_email': <string>
     }
 
     Parameters
@@ -211,8 +276,42 @@ def project_update_members(id):
     422: Error in updating the project
     
     """
+    # Function requirements:
     # Function should check for valid message.
     # Function should check that user you are trying to add exists in the database.
+    
+    # Format the input to json
+    req = request.get_json()
+
+    # Verify the input is valid
+    add_or_remove = req['add_or_remove']
+    user_email = req["user_email"]
+
+    if not(add_or_remove == 'add' or add_or_remove == 'remove'):
+        return {
+            'message': "Error in updating the project. Invalid Input"
+        }, 422
+    
+    if add_or_remove == 'add':
+        # We are adding a user, verify the user exist in the database
+        user = user_collection.find_one({'email':user_email})
+
+        if (user == None):
+            # No user was found in database, return error
+            return {
+                'message': "Error in updating the project, no user found"
+            }, 422
+
+        # Proceed to add the user, get its name first
+        first_name = user['first_name']
+
+        # Get list of users from project
+        project = projects_collection.find_one({"id":id})
+          
+    else:
+        # We are removing a user
+
+
     return
 
 @projects.route("/<id>", methods=["DELETE"])

@@ -95,11 +95,18 @@ def get_all_hardware():
     # The function currently returns the names of the hardwware sets,
     # More data might be needed in the future
     
-    req = request.get_json()
     hw_list = []
 
     for hw in hw_collection.find():
-        hw_list.append(hw['HWSetName'])
+
+        hw_dict = {
+            "HWSetName": hw['HWSetName'],
+            "total_quantity": hw['total_quantity'],
+            "available": hw['available'],
+            "checked_out": hw['checked_out']
+        }
+
+        hw_list.append(hw_dict)
 
     return jsonify(hw_list), 201
 
