@@ -43,9 +43,13 @@ def register():
 
     """
     req = request.get_json()
+
+    print("inside function", file=sys.stderr)
     user_email = req['email']
+    
     user = user_collection.find_one({'email':user_email})
-    print(f"User {user}")
+    print(f"User is {user}", file=sys.stderr)
+
     if(user_collection == None):
         encrypted_password = encryption.gen_hashed_password_with_salt(req['passowrd'])
         doc = {
@@ -75,6 +79,8 @@ def register():
             return {
                 'message': "User registered"
             }, 201
+    
+
 
 @users.route('/login', methods=["POST"])
 def login():

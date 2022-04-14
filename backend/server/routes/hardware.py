@@ -1,5 +1,6 @@
 from crypt import methods
 from flask import Blueprint, request
+from flask import jsonify
 from flask_jwt_extended import create_access_token
 
 import sys
@@ -54,13 +55,14 @@ def create_hardware():
                 "checked_out": 0
             }
         hw_collection.insert_one(doc)
-        # print("This worked first time!")
         return {
             'message': "Hardware Set Created"
         }, 201
     else:
         if(hw):
-            return "Hardware Set with this name already exists", 422
+            return {
+                'message': "Hardware Set with this name already exists"
+            }, 422
         else:
             doc = {
                 "HWSetName": req["HWSetName"],
@@ -90,11 +92,14 @@ def get_all_hardware():
     201: all hardware sets in the database
     """
     # Function should return list of all hardware sets in the database
+    # The function currently returns the names of the hardwware sets,
+    # More data might be needed in the future
+    
     req = request.get_json()
     hw_list = []
 
     for hw in hw_collection.find():
-        hw_list.append(hw)
+        hw_list.append(hw['HWSetName'])
 
-    return hw_list, 201
+    return jsonify(hw_list), 201
 

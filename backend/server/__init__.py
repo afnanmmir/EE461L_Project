@@ -42,14 +42,17 @@ def createApp():
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=14)
-    print(os.getenv('MONGO_URI'))
     cors.init_app(app) # Configure the app with cors instance
     jwt.init_app(app) # Configure the app with the jwt manager
     mongo.init_app(app) # Configure the app with the PyMongo client instance
 
     from server.routes.users import users
+    from server.routes.hardware import hardware
+    from server.routes.projects import projects
     from server.routes.main import main
     app.register_blueprint(main)
     app.register_blueprint(users, url_prefix='/users')
+    app.register_blueprint(hardware, url_prefix='/hardware')
+    app.register_blueprint(projects, url_prefix='/projects')
 
     return app
