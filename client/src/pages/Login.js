@@ -95,15 +95,17 @@ const LoginPage = () => {
                                         let response = respVal.response;
                                         let userEmail = JSON.stringify(response.data.email);
                                         let token = JSON.stringify(response.data.token);
-                                        auth.setIsAuth(true);
-                                        auth.setUser(userEmail);
+                                        // auth.setIsAuth(true);
+                                        // auth.setUser(userEmail);
                                         localStorage.setItem("token",token);
+                                        // localStorage.setItem("user",userEmail);
+                                        console.log(auth.user)
                                         navigate('../projects')
                                     }else{ // if the login attempt failed
                                         setModalVal(respVal.response);
                                         setShowModal(true);
                                     }
-                                })
+                                });
                             }
                         }}>
                             Sign Up

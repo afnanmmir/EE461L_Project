@@ -11,14 +11,16 @@ import api from "./httpClient";
  * contains a method to attempt to log in the user
  * Video on React Contexts: https://youtu.be/OvM4hIxrqAw
  */
-const AuthContext = React.createContext({
-    isAuth: localStorage.getItem("token") !== null ? true : false,
-    user: localStorage.getItem("user"),
-    setIsAuth:{},
-    setUser: {},
-    registerUser: {},
-    authenticateUser:{}
-})
+const AuthContext = React.createContext(
+//     {
+//     isAuth: localStorage.getItem("token") !== null ? true : false,
+//     user: localStorage.getItem("user"),
+//     setIsAuth:{},
+//     setUser: {},
+//     registerUser: {},
+//     authenticateUser:{}
+// }
+)
 
 
 /**
@@ -74,7 +76,10 @@ export const AuthContextProvider = ({children}) => {
             // setIsAuth(true);
             // setUser(JSON.stringify(resp.data.user));
             // localStorage.setItem("token", JSON.stringify(resp.data.token));
-            console.log("HELLO")
+            console.log("HELLO");
+            // localStorage
+            setUser(email);
+            setIsAuth(true);
             return {result: true, response: resp};
         }catch(error){
             if(error.response.status === 401){
@@ -94,7 +99,7 @@ export const AuthContextProvider = ({children}) => {
         registerUser: registerUser,
         authenticateUser: authenticateUser
     }
-
+    console.log('auth rerender: '+user);
     // creates AuthContext provider with given value for the context
     return (<AuthContext.Provider value={val}>
         {children}
