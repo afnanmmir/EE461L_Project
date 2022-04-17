@@ -38,7 +38,7 @@ def createApp():
     Instance of a Flask app.
     """
     load_dotenv()
-    app = Flask(__name__)
+    app = Flask(__name__, static_folder='../../client/build', static_url_path="")
     app.config['MONGO_URI'] = os.getenv('MONGO_URI')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=14)
