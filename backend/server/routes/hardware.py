@@ -103,7 +103,8 @@ def get_all_hardware():
             "HWSetName": hw['HWSetName'],
             "total_quantity": hw['total_quantity'],
             "available": hw['available'],
-            "checked_out": hw['checked_out']
+            "checked_out": hw['checked_out'],
+            "price_per_unit": hw["price_per_unit"]
         }
 
         hw_list.append(hw_dict)

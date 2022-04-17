@@ -12,6 +12,7 @@ import { Typography } from '@mui/material'
 import CreateProject from "../components/CreateProject";
 import ProjectTable from "../components/ProjectTable";
 import api from "../httpClient";
+import HardwareSetsTable from "../components/HardwareSetsTable";
 
 const Projects = () => {
     const [allProjects, setAllProjects] = useState([]);
@@ -23,9 +24,12 @@ const Projects = () => {
     const [hwSet, setHwSet] = useState("");
     const [checkoutQty, setCheckoutQty] = useState('');
     const [showDialog, setShowDialog] = useState(false);
-    const [allHWSets, setAllHWSets] = useState('');
+    const [allHWSets, setAllHWSets] = useState([]);
     const [projectID, setProjectID] = useState('');
     const[showDeleteMessage, setShowDeleteMessage] = useState(false);
+    const [showJoinSuccess, setShowJoinSuccess] = useState(false);
+    const [showJoinFail, setShowJoinFail] = useState(false)
+    const [joinFailMessage, setJoinFailMessage] = useState('');
     
     
 
@@ -36,6 +40,8 @@ const Projects = () => {
     const auth = useAuthContext();
     const deleteProjectMessage = "Project successfully deleted.";
     const errorDeleteProjectMessage = "Error in deleting project";
+    const joinSuccessMessage = "Joined project successfully";
+    
 
 
     const getUserProjects = () => {
@@ -93,8 +99,15 @@ const Projects = () => {
                 user_email: user
             }).then((response) => {
                 getUserProjects();
+                setShowJoinSuccess(true);
             }).catch((e) => {
-                console.log(e);
+                console.log(e.response);
+                if(e.response.status === 404){
+                    setJoinFailMessage("Error. Project not found.");
+                }else{
+                    setJoinFailMessage("Error. You have already joined this project.");
+                }
+                setShowJoinFail(true);
             })
         }
     }
@@ -142,6 +155,14 @@ const Projects = () => {
 
     const handleDeleteMessageClose = () => {
         setShowDeleteMessage(false);
+    }
+
+    const handleJoinSuccessClose = () => {
+        setShowJoinSuccess(false);
+    }
+
+    const handleJoinFailClose = () => {
+        setShowJoinFail(false);
     }
 
     const renderHWSetsTable = () =>{
@@ -213,10 +234,10 @@ const Projects = () => {
             </Paper>
         )
     }
-    useEffect(async () => {
+    useEffect(() => {
         getUserProjects();
         getHardwareSets();
-        
+        console.log(`all hw sets: ${allProjects}`)
       }, [auth.user]);
 
     useEffect(() => {
@@ -245,45 +266,48 @@ const Projects = () => {
             </Box>
             <Box>
                 <Grid container direction={"row"} spacing={2}>
-                    <Grid item xs={4}>
-                        <CreateProject projects={allProjects} getAllProjects={getUserProjects} user={userEmail}/>
-                        <Paper
-                        sx={{
-                            display: 'flex',
-                            flexDirection: 'column',
-                            alignItems: 'center',
-                        }}>
-                            <Grid container direction={"column"} spacing={1} alignContent="center" flexGrow={2}>
-                                <Grid item>
-                                    <Typography variant="h5" fontWeight="bold">Join Project</Typography>
-                                </Grid>
-                                    <Grid item>
-                                        <TextField 
-                                        label = "Project ID" 
-                                        variant = "filled"
-                                        placeholder="Project ID"
-                                        required
-                                        value = {projectID}
-                                        onChange={e => setProjectID(e.target.value)}
-                                        />
-                                    </Grid>
-                                    <Grid item>
-                                        <Button
-                                        onClick={() => {
-                                            handleJoin(projectID,auth.user);
-                                        }}>
-                                            Join Project
-                                        </Button>
-                                    </Grid>
+                <Grid item xs={4}>
+                    <CreateProject projects={allProjects} getAllProjects={getUserProjects} user={userEmail}/>
+                    <Paper
+                    sx={{
+                        display: 'flex',
+                        flexDirection: 'column',
+                        alignItems: 'center',
+                    }}>
+                        <Grid container direction={"column"} spacing={1} alignContent="center" flexGrow={2}>
+                            <Grid item>
+                                <Typography variant="h5" fontWeight="bold">Join Project</Typography>
                             </Grid>
-                        </Paper>
-                    </Grid>
-                    <Grid item xs={8} style={{textAlign: "center"}}>
-                        <Box>
-                            {allProjects.length <=0 ? (<Typography>No Projects have been made yet.</Typography>) : (<ProjectTable projects={allProjects} openProject={openProject} deleteProject={deleteProject}/>)}
-                        </Box>
-                    </Grid>
+                                <Grid item>
+                                    <TextField 
+                                    label = "Project ID" 
+                                    variant = "filled"
+                                    placeholder="Project ID"
+                                    required
+                                    value = {projectID}
+                                    onChange={e => setProjectID(e.target.value)}
+                                    />
+                                </Grid>
+                                <Grid item>
+                                    <Button
+                                    onClick={() => {
+                                        handleJoin(projectID,auth.user);
+                                    }}>
+                                        Join Project
+                                    </Button>
+                                </Grid>
+                        </Grid>
+                    </Paper>
                 </Grid>
+                <Grid item xs={8} style={{textAlign: "center"}}>
+                    <Box>
+                        {allProjects.length <=0 ? (<Typography>No Projects have been made yet.</Typography>) : (<ProjectTable projects={allProjects} openProject={openProject} deleteProject={deleteProject}/>)}
+                    </Box>
+                </Grid>
+            </Grid>
+            {allHWSets.length <= 0 ? null : <HardwareSetsTable hwSets={allHWSets}/>}
+                
+                
             </Box>
             {showDialog === true ? (
             <Dialog
@@ -403,6 +427,48 @@ const Projects = () => {
                         aria-label="close"
                         color="inherit"
                         onClick={() => handleDeleteMessageClose()}>
+                            <CloseIcon fontSize="small"/>
+                        </IconButton>
+                    </React.Fragment>
+                }
+                />
+                <Snackbar
+                anchorOrigin={{
+                    vertical:'bottom',
+                    horizontal:'left'
+                }}
+                open={showJoinSuccess}
+                autoHideDuration={5000}
+                onClose={() => handleJoinSuccessClose()}
+                message={joinSuccessMessage}
+                action={
+                    <React.Fragment>
+                        <IconButton
+                        size="small"
+                        aria-label="close"
+                        color="inherit"
+                        onClick={() => handleJoinSuccessClose()}>
+                            <CloseIcon fontSize="small"/>
+                        </IconButton>
+                    </React.Fragment>
+                }
+                />
+                <Snackbar
+                anchorOrigin={{
+                    vertical:'bottom',
+                    horizontal:'left'
+                }}
+                open={showJoinFail}
+                autoHideDuration={5000}
+                onClose={() => handleJoinFailClose()}
+                message={joinFailMessage}
+                action={
+                    <React.Fragment>
+                        <IconButton
+                        size="small"
+                        aria-label="close"
+                        color="inherit"
+                        onClick={() => handleJoinFailClose()}>
                             <CloseIcon fontSize="small"/>
                         </IconButton>
                     </React.Fragment>

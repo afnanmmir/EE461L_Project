@@ -222,6 +222,8 @@ def project_checkout(id):
     if hw_set == None:
         return {"message": "Hardware set not found in hardware database"}, 404
 
+    price_per = hw_set["price_per_unit"]
+
     # Calculte the new amount of items available of this hw set
     new_available = hw_set['available'] - int(amount)
 
@@ -231,11 +233,18 @@ def project_checkout(id):
         new_available = 0
         checked_out = hw_set['available']
 
+    funds = int(project["funds"])
+    total_price = price_per * checked_out
+    if(total_price > funds):
+        return {"message":"Not enough funds to check out"}, 422
+
     # Set the new amount in the dictionary for this hw set
     hw_sets[index]["qty"] = hw_sets[index]["qty"] + checked_out
 
     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
     projects_collection.update_one({"_id": id}, {"$set": {"hw_sets": hw_sets}})
+    projects_collection.update_one({"_id": id}, {"$set": {"funds": str(funds - total_price)}})
+
 
     # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
@@ -324,8 +333,10 @@ def project_checkin(id):
         return {"message": "Hardware set not found in hardware database"}, 404
     if(new_checked_out <= 0):
         hw_sets.remove(hw_sets[index])
+    funds = int(project["funds"])
      # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
     projects_collection.update_one({"_id": id}, {"$set": {"hw_sets": hw_sets}})
+    
 
      # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
@@ -336,6 +347,10 @@ def project_checkin(id):
         {"HWSetName": hw_set_name},
         {"$set": {"checked_out": hw_set['checked_out'] - amount}},
     )
+    hw_set = hardware_collection.find_one({"HWSetName":hw_set_name})
+    total_add_back = hw_set["price_per_unit"]* amount
+    projects_collection.update_one({"_id": id}, {"$set": {"funds": str(funds + total_add_back)}})
+
 
     # Return success message
     return {"message": "Project has been successfully updated"}, 201
