@@ -48,7 +48,6 @@ const LoginPage = () => {
         <div>
             <Toolbar position="relative">
                 <a href='/'><Button variant='outlined'>Home</Button></a>
-                <a href='/datasets'><Button variant='outlined'>DataSets</Button></a>
                 <a href='/login'><Button variant='outlined'>Log in</Button></a>
                 <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
             </Toolbar>

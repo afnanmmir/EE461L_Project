@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Context } from "react";
 import api from "./httpClient";
+import axios from "axios";
 /**
  * Context object that contains the current authorization state of the app.
  * Contains a boolean for if it is authenticated
@@ -11,7 +12,7 @@ import api from "./httpClient";
  * contains a method to attempt to log in the user
  * Video on React Contexts: https://youtu.be/OvM4hIxrqAw
  */
-const AuthContext = React.createContext(
+export const AuthContext = React.createContext(
 //     {
 //     isAuth: localStorage.getItem("token") !== null ? true : false,
 //     user: localStorage.getItem("user"),
@@ -39,7 +40,7 @@ export const AuthContextProvider = ({children}) => {
     // const auth = AuthClass();
     // const [credentials, setCredentials] = useState(null);
     // State for whether user is authenticated or not. Will be used as a value for the context object
-    console.log(AuthContext);
+    // console.log(AuthContext);
     const [isAuth, setIsAuth] = useState(localStorage.getItem("is_authenticated"));
     // State for the authenticated user email. Will be used as a value in the context object.
     const [user, setUser] = useState(localStorage.getItem("current_user"));
@@ -90,6 +91,13 @@ export const AuthContextProvider = ({children}) => {
         }
     }
 
+    const handleLogOut = () =>{
+        localStorage.clear();
+        setUser('');
+        setIsAuth(false);
+        axios.defaults.headers.common['Authorization'] = '';
+    }
+
 
     let val = {
         isAuth: isAuth,
@@ -97,9 +105,10 @@ export const AuthContextProvider = ({children}) => {
         setIsAuth: setIsAuth,
         setUser: setUser,
         registerUser: registerUser,
-        authenticateUser: authenticateUser
+        authenticateUser: authenticateUser,
+        logOutUser: handleLogOut
     }
-    console.log('auth rerender: '+user);
+    console.log('auth rerender: '+user + isAuth);
     // creates AuthContext provider with given value for the context
 
     useEffect(() => {
@@ -110,7 +119,8 @@ export const AuthContextProvider = ({children}) => {
     }, [])
 
     useEffect(() => {
-        localStorage.setItem("is_authenticated", true);
+        console.log("I am trying to log in")
+        localStorage.setItem("is_authenticated", isAuth);
         localStorage.setItem("current_user", user);
     },[isAuth, user])
 

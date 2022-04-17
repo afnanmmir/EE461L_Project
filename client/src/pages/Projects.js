@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from "react";
-import { AppBar, Box, Dialog, DialogContent, Grid, Input, makeStyles, Menu, MenuItem, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Snackbar } from '@mui/material'; 
+import { AppBar, Box, Dialog, DialogContent, Grid, Input, makeStyles, Menu, MenuItem, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Snackbar, IconButton } from '@mui/material'; 
 import { Button } from '@mui/material';
 import { TextField } from '@mui/material';
 import { Container } from '@mui/material';
+import CloseIcon from '@material-ui/icons/Close'; 
 // import httpClient from '../httpClient';
 // import { useAuthContext } from '../Authentication';
 import { useNavigate } from 'react-router-dom';
@@ -24,12 +25,17 @@ const Projects = () => {
     const [showDialog, setShowDialog] = useState(false);
     const [allHWSets, setAllHWSets] = useState('');
     const [projectID, setProjectID] = useState('');
+    const[showDeleteMessage, setShowDeleteMessage] = useState(false);
+    
+    
 
     const handleOpenDialog = () => setShowDialog(true);
     const handleCloseDialog = () => setShowDialog(false);
 
     const navigate = useNavigate();
     const auth = useAuthContext();
+    const deleteProjectMessage = "Project successfully deleted.";
+    const errorDeleteProjectMessage = "Error in deleting project";
 
 
     const getUserProjects = () => {
@@ -128,9 +134,14 @@ const Projects = () => {
         let id = project._id;
         api().delete("/projects/" + id).then((response) => {
             getUserProjects();
+            setShowDeleteMessage(true);
         }).catch((e) => {
             console.log(e);
         })
+    }
+
+    const handleDeleteMessageClose = () => {
+        setShowDeleteMessage(false);
     }
 
     const renderHWSetsTable = () =>{
@@ -228,7 +239,7 @@ const Projects = () => {
                         </Typography>
                         <Button color="inherit">Projects</Button>
                         <Button color="inherit" href="../datasets">DataSets</Button>
-                        <Button color="inherit">Logout</Button>
+                        <Button color="inherit" onClick={() => {auth.logOutUser(); navigate('/')}}>Logout</Button>
                     </Toolbar>
                 </AppBar>
             </Box>
@@ -376,6 +387,27 @@ const Projects = () => {
                 </DialogContent>
             </Dialog>
             ) : null}
+            <Snackbar
+                anchorOrigin={{
+                    vertical:'bottom',
+                    horizontal:'left'
+                }}
+                open={showDeleteMessage}
+                autoHideDuration={5000}
+                onClose={() => handleDeleteMessageClose()}
+                message={deleteProjectMessage}
+                action={
+                    <React.Fragment>
+                        <IconButton
+                        size="small"
+                        aria-label="close"
+                        color="inherit"
+                        onClick={() => handleDeleteMessageClose()}>
+                            <CloseIcon fontSize="small"/>
+                        </IconButton>
+                    </React.Fragment>
+                }
+                />
         </div>
     )
 }

@@ -11,6 +11,7 @@ import AppBar from '@mui/material/AppBar'
 import Typography from '@mui/material/Typography'
 import Button from '@mui/material/Button'
 import { Toolbar, Box } from '@mui/material';
+import { AuthClass, useAuthContext } from '../Authentication'
 
 
 function createData(name, description, download, carbs, protein) {
@@ -26,20 +27,21 @@ const rows = [
 ];
 
 const DataSet = () => {
-    const userEmail = "afnan@gmail.com";
-    const userFirstName = "Afnan";
-    const userLastName = "Mir";
+    // const userEmail = "afnan@gmail.com";
+    // const userFirstName = "Afnan";
+    // const userLastName = "Mir";
+    const auth = useAuthContext();
     return (
       <div> 
       <Box sx={{ flexGrow: 1 }}>
           <AppBar position="relative">
               <Toolbar>
                   <Typography variant="h6" component="div" align='left' sx={{ flexGrow:1 }}>
-                      Welcome {`${userFirstName} ${userLastName}`}
+                      Welcome {`${auth.user}`}
                   </Typography>
                   <Button color="inherit" href='../projects'>Projects</Button>
                   <Button color="inherit" href="../datasets">DataSets</Button>
-                  <Button color="inherit">Logout</Button>
+                  <Button color="inherit" onClick={() => {auth.logOutUser()}}>Logout</Button>
               </Toolbar>
           </AppBar>
         </Box>

@@ -5,18 +5,22 @@ import CreateProject from './components/CreateProject';
 
 import SignUpComponent from './pages/SignUp';
 import AppRouter from './router';
-import { BrowserRouter } from 'react-router-dom';
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import LandingPage from './pages/LandingPage';
-import { AuthContextProvider } from './Authentication';
+import { AuthContextProvider, useAuthContext } from './Authentication';
+import LoginPage from './pages/Login';
 
 function App() {
+  const context = useAuthContext()
   return (
     <div className="App">
       <AuthContextProvider>
-        <AppRouter />
+        <AppRouter/>
       </AuthContextProvider>
     </div>
   );
 }
+
+
 
 export default App;

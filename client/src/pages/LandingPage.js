@@ -44,7 +44,6 @@ const LandingPage = () => {
                         spacing={2}
                         justifyContent="center"
                     >
-                        <a href='/datasets'><Button variant='outlined'>DataSets</Button></a>
                         <a href='/login'><Button variant='contained'>Log in</Button></a>
                         <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
                     </Stack>

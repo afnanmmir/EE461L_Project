@@ -454,7 +454,19 @@ def delete_project(id):
 
     if project == None:
         return {"message": "Error. No such project exists"}, 404
-
+    hw_sets = project['hw_sets']
+    for i in hw_sets:
+        name = i["name"]
+        amount = i["qty"]
+        hw_set = hardware_collection.find_one({"HWSetName":name})
+        hardware_collection.update_one(
+            {"HWSetName": name},
+            {"$set": {"available": hw_set['available'] + amount}}
+        )
+        hardware_collection.update_one(
+            {"HWSetName": name},
+            {"$set": {"checked_out": hw_set['checked_out'] - amount}}
+        )
     projects_collection.delete_one({"_id": id})
 
     return {"message": "Deleted project"}, 201
