@@ -98,8 +98,8 @@ const LoginPage = () => {
                                         // auth.setIsAuth(true);
                                         // auth.setUser(userEmail);
                                         localStorage.setItem("token",token);
-                                        // localStorage.setItem("user",userEmail);
-                                        console.log(auth.user)
+                                        localStorage.setItem("user",userEmail);
+                                        console.log(localStorage.getItem("user"))
                                         navigate('../projects')
                                     }else{ // if the login attempt failed
                                         setModalVal(respVal.response);

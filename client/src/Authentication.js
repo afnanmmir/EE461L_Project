@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Context } from "react";
 import api from "./httpClient";
 /**
@@ -39,10 +39,10 @@ export const AuthContextProvider = ({children}) => {
     // const auth = AuthClass();
     // const [credentials, setCredentials] = useState(null);
     // State for whether user is authenticated or not. Will be used as a value for the context object
-    const [isAuth, setIsAuth] = useState(AuthContext.isAuth);
+    console.log(AuthContext);
+    const [isAuth, setIsAuth] = useState(localStorage.getItem("is_authenticated"));
     // State for the authenticated user email. Will be used as a value in the context object.
-    const [user, setUser] = useState(AuthContext.user);
-    console.log("THIS IS PRINTED");
+    const [user, setUser] = useState(localStorage.getItem("current_user"));
     // Method to attempt to register a user's account. Will be used as a method in the context object.
     const registerUser = async(firstName, lastName, email, password) =>{
         try{
@@ -101,6 +101,19 @@ export const AuthContextProvider = ({children}) => {
     }
     console.log('auth rerender: '+user);
     // creates AuthContext provider with given value for the context
+
+    useEffect(() => {
+        const authenticated = localStorage.getItem("is_authenticated");
+        const cUser = localStorage.getItem("current_user");
+        setIsAuth(authenticated);
+        setUser(cUser);
+    }, [])
+
+    useEffect(() => {
+        localStorage.setItem("is_authenticated", true);
+        localStorage.setItem("current_user", user);
+    },[isAuth, user])
+
     return (<AuthContext.Provider value={val}>
         {children}
     </AuthContext.Provider>);

@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { AppBar, Box, Grid, Modal, Paper, Toolbar } from '@mui/material'; 
+import { AppBar, Box, Grid, Modal, Paper, Toolbar, Snackbar, IconButton } from '@mui/material';
+import CloseIcon from '@material-ui/icons/Close'; 
 import { Button } from '@mui/material';
 import { TextField } from '@mui/material';
 import { Container } from '@mui/material';
@@ -25,12 +26,27 @@ const CreateProject = (props) => {
     const [projectName, setProjectName] = useState("");
     const [projectDescription, setProjectDescription] = useState("");
     const [projectFunds, setProjectFunds] = useState("");
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
+    const [successMessage, setSuccessMessage] = useState("");
+    const [errorMessage, setErrorMessage] = useState("");
 
     const auth = useAuthContext();
+    const success = "Project Created!"
+
+    const handleSuccessSnackbarClose = () => {
+        setShowSuccessSnackbar(false);
+    }
+
+    const handleErrorSnackbarClose = () => {
+        setShowErrorSnackbar(false);
+    }
 
     const handleSubmit = () => {
         if(projectName === "" || projectDescription === "" || projectFunds ===""){
-            alert("Please fill out all fields.")
+            console.log("IM IN HERE")
+            setErrorMessage("Please fill out all fields in order to create the project.")
+            setShowErrorSnackbar(true);
         }else{
             let newProject = {
                 name: projectName,
@@ -38,14 +54,19 @@ const CreateProject = (props) => {
                 description: projectDescription,
                 funds: projectFunds,
                 users: [props.user],
-                HWSets: []
+                hw_sets: []
             };
-            api().post("/projects",newProject).then((response) => {
+            api().post("/projects/",newProject).then((response) => {
+                console.log(response.data.success)
                 if(response.data.success){
                     props.getAllProjects();
+                    setSuccessMessage(success);
+                    setShowSuccessSnackbar(true);
                 }
+
             }).catch((e) => {
-                console.log(e);
+                setErrorMessage("Error in creating project, make sure the name you provided is unique.");
+                setShowErrorSnackbar(true)
             });
             
             // props.addProjects(props.projects.concat(newProject));
@@ -101,6 +122,52 @@ const CreateProject = (props) => {
                 </Button>
             </Grid>
         </Grid>
+        <Snackbar
+        anchorOrigin={{
+            vertical:'bottom',
+            horizontal:'left'
+        }}
+        open={showSuccessSnackbar}
+        autoHideDuration={5000}
+        onClose={() => handleSuccessSnackbarClose()}
+        message={successMessage}
+        action={
+            <React.Fragment>
+                <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={() => handleSuccessSnackbarClose()}>
+                    <CloseIcon fontSize="small"/>
+                </IconButton>
+            </React.Fragment>
+        }
+        >
+
+        </Snackbar>
+        <Snackbar
+        anchorOrigin={{
+            vertical:'bottom',
+            horizontal:'left'
+        }}
+        open={showErrorSnackbar}
+        autoHideDuration={5000}
+        onClose={() => handleErrorSnackbarClose()}
+        message={errorMessage}
+        action={
+            <React.Fragment>
+                <IconButton
+                size="small"
+                aria-label="close"
+                color="inherit"
+                onClick={() => handleErrorSnackbarClose()}>
+                    <CloseIcon fontSize="small"/>
+                </IconButton>
+            </React.Fragment>
+        }
+        >
+
+        </Snackbar>
     </Paper>
   )
 }

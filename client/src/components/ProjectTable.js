@@ -51,9 +51,9 @@ const ProjectTable = (props) => {
                 </TableHead>
                 <TableBody>
                     {props.projects.map(project =>(
-                        <TableRow key={project.name}>
+                        <TableRow key={project.project_name}>
                             <TableCell component='th' scope="row" align="center">
-                                {project.name}
+                                {project.project_name}
                             </TableCell>
                             <TableCell align="center">{project.description}</TableCell>
                             <TableCell align="center">{project.creator}</TableCell>

@@ -60,6 +60,8 @@ def create_project():
     # Function should check to make sure project of given name has not already been created by the user
 
     # Format the input to json
+    print("MADE IT HERE")
+
     req = request.get_json()
 
     # Obtain the creator's user name (I'm assuming the first name is passed in here)
@@ -93,23 +95,24 @@ def create_project():
 
     # Create document's dictionary
     doc = {
-        "id": project_id,
+        "_id": project_id,
         "project_name": project_name,
         "description": description,
+        "creator":creator_email,
         "funds": funds,
         "users": users,
-        "hw_sets": hw_sets,
+        "hw_sets": [],
     }
 
     # Insert document into projects_collection
     projects_collection.insert_one(doc)
-
+    print("Inserted")
     # Return success message
-    return {"message": "Newly created project"}, 201
+    return {"message": "Newly created project", "success": True}, 201
 
 
-@projects.route("/", methods=["GET"])
-def get_projects():
+@projects.route("/<userEmail>", methods=["GET"])
+def get_projects(userEmail):
     """
     GET projects/
 
@@ -117,7 +120,8 @@ def get_projects():
 
     Parameters
     ----------
-    None.
+    user: string
+        - the email of the current user
 
     Returns
     -------
@@ -130,9 +134,10 @@ def get_projects():
 
     # Format the input to json
     req = request.get_json()
+    print(userEmail)
 
     # Gets the user's email from json input
-    userEmail = req["user"]
+    # userEmail = req["user"]
 
     # Gets the user's name from their email
     user = user_collection.find_one({"email": userEmail})
@@ -144,16 +149,16 @@ def get_projects():
 
     # Creates list of all projects with the user's name in the users field
     project_list = []
-
     for p in projects_collection.find():
         userArray = p["users"]
+        print(userArray)
         if userEmail in userArray:
             p_temp = p.copy()
-            del p_temp["_id"]
             print(project_list, file=sys.stderr)
             project_list.append(p_temp)
-
-    return jsonify(project_list), 200
+    print("JSON Below")
+    # print(jsonify(project_list).)
+    return {'projects':project_list}, 200
 
 
 @projects.route("/checkout/<id>", methods=["PUT"])
@@ -185,11 +190,12 @@ def project_checkout(id):
 
     # Format the input to json
     req = request.get_json()
+    print(req)
     hw_set_name = req["HWSetName"]
     amount = req["amount"]
 
     # Verify a project with such id exits
-    project = projects_collection.find_one({"id": id})
+    project = projects_collection.find_one({"_id": id})
 
     if project == None:
         return {"message": "Project not found"}, 404
@@ -197,10 +203,17 @@ def project_checkout(id):
     hw_sets = project["hw_sets"]
 
     # If this hardware set hadn't been checked out before in this project we init to 0 here
-    if hw_set_name not in hw_sets:
-        hw_sets[hw_set_name] = 0
+    # if hw_set_name not in hw_sets:
+    #     hw_sets.append({hw_set_name: 0})
+    index = -1
+    for i,x in enumerate(hw_sets):
+        if(x["name"] == hw_set_name):
+            index = i
+    if(index == -1):
+        hw_sets.append({"name": hw_set_name,"qty": 0})
+        index = len(hw_sets) - 1
 
-    checked_out = amount
+    checked_out = int(amount)
 
      # Get hardawre set document from hardware collection
     hw_set = hardware_collection.find_one({"HWSetName": hw_set_name})
@@ -210,7 +223,7 @@ def project_checkout(id):
         return {"message": "Hardware set not found in hardware database"}, 404
 
     # Calculte the new amount of items available of this hw set
-    new_available = hw_set['available'] - amount
+    new_available = hw_set['available'] - int(amount)
 
     if new_available < 0:
         # If the new available amount is less than 0, we tried to withdraw more than available
@@ -219,10 +232,10 @@ def project_checkout(id):
         checked_out = hw_set['available']
 
     # Set the new amount in the dictionary for this hw set
-    hw_sets[hw_set_name] = hw_sets[hw_set_name] + checked_out
+    hw_sets[index]["qty"] = hw_sets[index]["qty"] + checked_out
 
     # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
-    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
+    projects_collection.update_one({"_id": id}, {"$set": {"hw_sets": hw_sets}})
 
     # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
@@ -269,39 +282,50 @@ def project_checkin(id):
     # Format the input to json
     req = request.get_json()
     hw_set_name = req["HWSetName"]
-    amount = req["amount"]
+    amount = int(req["amount"])
 
     # Verify a project with such id exits
-    project = projects_collection.find_one({"id": id})
+    project = projects_collection.find_one({"_id": id})
 
     if project == None:
         return {"message": "Project not found"}, 404
 
     hw_sets = project["hw_sets"]
+    print(hw_sets)
 
     # Verify the project already has this hw set on its list
-    if hw_set_name not in hw_sets: 
-        return {"message": "Hardware set not found in project list"}, 404
+    # if hw_set_name not in hw_sets: 
+    #     return {"message": "Hardware set not found in project list"}, 404
     
-    currently_checked_out = hw_sets[hw_set_name]
-
+    # currently_checked_out = hw_sets[hw_set_name]
+    index = -1
+    for i,x in enumerate(hw_sets):
+        print(hw_sets)
+        if(x["name"] == hw_set_name):
+            index = i
+            break
+    
+    if(index == -1):
+        return {"message": "Hardware set not found in project list"}, 
     # If we are trying to check in more than what we have checked out, return error
-    if amount > currently_checked_out:
+    currently_checked_out = hw_sets[index]["qty"]
+    if int(amount) > currently_checked_out:
         return {"message": "Error in updating the project. Attempted to check in more than amount checked out."}, 422
     
-    new_checked_out = currently_checked_out - amount
+    new_checked_out = currently_checked_out - int(amount)
 
     # Update hw_set dictionary in projects, we subtract to the checked out amounts
-    hw_sets[hw_set_name] = new_checked_out
-
+    hw_sets[index]["qty"] = new_checked_out
+    print(f"new checkout: {hw_sets[index]['qty']}")
     # Verify hw set was found in database
     hw_set = hardware_collection.find_one({"HWSetName":hw_set_name})
     
     if hw_set == None:
         return {"message": "Hardware set not found in hardware database"}, 404
-    
+    if(new_checked_out <= 0):
+        hw_sets.remove(hw_sets[index])
      # Update this specific project using its id as the filter setting the new hw_sets dictionary with the new checked out amount
-    projects_collection.update_one({"id": id}, {"$set": {"hw_sets": hw_sets}})
+    projects_collection.update_one({"_id": id}, {"$set": {"hw_sets": hw_sets}})
 
      # Update the hardware collection database using the hw set name as filter. Update the available amount and the checked_out amount
     hardware_collection.update_one(
@@ -347,13 +371,16 @@ def project_update_members(id):
 
     # Format the input to json
     req = request.get_json()
+    print(req)
 
     # Verify the input is valid
     add_or_remove = req["add_or_remove"]
     user_email = req["user_email"]
 
+
+
     if not (add_or_remove == "add" or add_or_remove == "remove"):
-        return {"message": "Error in updating the project. Invalid Input"}, 422
+        return {"message": "Error in updating the project. Invalid Input"}, 400
 
     if add_or_remove == "add":
         # We are adding a user, verify the user exist in the database
@@ -361,19 +388,23 @@ def project_update_members(id):
 
         if user == None:
             # No user was found in database, return error
-            return {"message": "Error in updating the project, no user found"}, 422
+            return {"message": "Error in updating the project, no user found"}, 404
 
         # Proceed to add the user
         userEmail = user["email"]
 
         # Get list of users from project
-        project = projects_collection.find_one({"id": id})
+        project = projects_collection.find_one({"_id": id})
+        if project == None:
+            return {"message": "Error. Project was not found"}, 404
+
+
         userList = project["users"].copy()
         if userEmail in userList:
             return {"message": "User already in project"}, 422
 
         userList.append(userEmail)
-        projects_collection.update_one({"id": id}, {"$set": {"users": userList}})
+        projects_collection.update_one({"_id": id}, {"$set": {"users": userList}})
 
         return {"message": "User successfully added"}, 201
     else:
@@ -419,12 +450,12 @@ def delete_project(id):
 
     # NOTE: We are assuming that the format of the id is userEmail_projectName
 
-    project = projects_collection.find_one({"id": id})
+    project = projects_collection.find_one({"_id": id})
 
     if project == None:
-        return {"message": "Project did not exist already"}, 201
+        return {"message": "Error. No such project exists"}, 404
 
-    projects_collection.delete_one({"id": id})
+    projects_collection.delete_one({"_id": id})
 
     return {"message": "Deleted project"}, 201
 

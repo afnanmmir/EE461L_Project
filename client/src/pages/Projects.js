@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { AppBar, Box, Dialog, DialogContent, Grid, Input, makeStyles, Menu, MenuItem, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar } from '@mui/material'; 
+import { AppBar, Box, Dialog, DialogContent, Grid, Input, makeStyles, Menu, MenuItem, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Snackbar } from '@mui/material'; 
 import { Button } from '@mui/material';
 import { TextField } from '@mui/material';
 import { Container } from '@mui/material';
@@ -19,9 +19,11 @@ const Projects = () => {
     // const [projectName, setProjectName] = useState('');
     // const [projectDescription, setProjectDescription] = useState('');
     // const [projectFunds, setProjectFunds] = useState(0);
-    const [hwSet, setHwSet] = useState('');
+    const [hwSet, setHwSet] = useState("");
     const [checkoutQty, setCheckoutQty] = useState('');
     const [showDialog, setShowDialog] = useState(false);
+    const [allHWSets, setAllHWSets] = useState('');
+    const [projectID, setProjectID] = useState('');
 
     const handleOpenDialog = () => setShowDialog(true);
     const handleCloseDialog = () => setShowDialog(false);
@@ -29,14 +31,66 @@ const Projects = () => {
     const navigate = useNavigate();
     const auth = useAuthContext();
 
+
     const getUserProjects = () => {
-        api().get("/projects", {
+        console.log(auth.user)
+        let userEmail = {
             user: auth.user
-        }).then((response) => {
-            setAllProjects(response.data);
+        }
+        console.log(userEmail)
+        api().get("/projects/" + auth.user).then((response) => {
+            setAllProjects(response.data.projects);
+            console.log(response.data.projects)
         }).catch((e)=>{
             console.log(e);
         });
+    }
+
+    const getHardwareSets = () => {
+        api().get("/hardware/").then((hardwares) => {
+            setAllHWSets(hardwares.data)
+            console.log(hardwares.data)
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+
+    const handleCheckout = (qty) => {
+        console.log("Hello")
+        api().put("/projects/checkout/"+ selectedProject._id,{
+            HWSetName: hwSet,
+            amount: qty
+        }).then((response) => {
+            getUserProjects();
+            getHardwareSets();
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+
+    const handleCheckin = (qty) => {
+        api().put("/projects/checkin/"+ selectedProject._id,{
+            HWSetName: hwSet,
+            amount: qty
+        }).then((response) => {
+            getUserProjects();
+            getHardwareSets();
+        }).catch((e) => {
+            console.log(e);
+        })
+    }
+
+    const handleJoin = (projectID, user) => {
+        if(projectID !== ''){
+            api().put("/projects/members/"+ projectID,{
+                add_or_remove: "add",
+                user_email: user
+            }).then((response) => {
+                getUserProjects();
+            }).catch((e) => {
+                console.log(e);
+            })
+        }
     }
 
     // const d
@@ -73,7 +127,7 @@ const Projects = () => {
     const deleteProject = (project) => {
         let id = project._id;
         api().delete("/projects/" + id).then((response) => {
-            props.getAllProjects();
+            getUserProjects();
         }).catch((e) => {
             console.log(e);
         })
@@ -99,13 +153,13 @@ const Projects = () => {
                             </TableRow>
                         </TableHead>
                         <TableBody>
-                            {selectedProject.HWSets.map(HWSet => (
+                            {selectedProject.hw_sets.map(HWSet => (
                                 <TableRow>
                                     <TableCell align="center">
                                         {HWSet.name}
                                     </TableCell>
                                     <TableCell align="center">
-                                        {HWSet.checkedOut}
+                                        {HWSet.qty}
                                     </TableCell>
                                 </TableRow>
                             ))}
@@ -148,7 +202,22 @@ const Projects = () => {
             </Paper>
         )
     }
+    useEffect(async () => {
+        getUserProjects();
+        getHardwareSets();
+        
+      }, [auth.user]);
 
+    useEffect(() => {
+        if(allProjects.length !== 0 && selectedProject !== null){
+            allProjects.forEach((element) => {
+                if(element._id === selectedProject._id){
+                    setSelectedProject(element);
+                    console.log("Found project")
+                }
+            })
+        }
+    },[allProjects])
     return (
         <div>
             <Box sx={{ flexGrow: 1 }}>
@@ -167,6 +236,36 @@ const Projects = () => {
                 <Grid container direction={"row"} spacing={2}>
                     <Grid item xs={4}>
                         <CreateProject projects={allProjects} getAllProjects={getUserProjects} user={userEmail}/>
+                        <Paper
+                        sx={{
+                            display: 'flex',
+                            flexDirection: 'column',
+                            alignItems: 'center',
+                        }}>
+                            <Grid container direction={"column"} spacing={1} alignContent="center" flexGrow={2}>
+                                <Grid item>
+                                    <Typography variant="h5" fontWeight="bold">Join Project</Typography>
+                                </Grid>
+                                    <Grid item>
+                                        <TextField 
+                                        label = "Project ID" 
+                                        variant = "filled"
+                                        placeholder="Project ID"
+                                        required
+                                        value = {projectID}
+                                        onChange={e => setProjectID(e.target.value)}
+                                        />
+                                    </Grid>
+                                    <Grid item>
+                                        <Button
+                                        onClick={() => {
+                                            handleJoin(projectID,auth.user);
+                                        }}>
+                                            Join Project
+                                        </Button>
+                                    </Grid>
+                            </Grid>
+                        </Paper>
                     </Grid>
                     <Grid item xs={8} style={{textAlign: "center"}}>
                         <Box>
@@ -189,13 +288,13 @@ const Projects = () => {
                         alignItems: 'center'
                     }}
                 >
-                    <Typography align="center">
-                        Opened Project: Afnan Mir
+                    <Typography variant="h6" align="center">
+                        {selectedProject.project_name} created by: {selectedProject.creator}
                     </Typography>
                 </AppBar>
                 <DialogContent>
                     <Typography align="center">
-                            This is the description of the project that has just been opened. This is just a placeholder for now.
+                            {selectedProject.description}
                     </Typography>
                     <Typography variant="h4" align="center">Hardware Sets</Typography>
                     {renderHWSetsTable()}
@@ -231,14 +330,15 @@ const Projects = () => {
                                             <TextField
                                             select
                                             fullWidth={true}
+                                            value={hwSet}
                                             onChange={e => {setHwSet(e.target.value);}}
                                             >
-                                                {hardwareSets.map((option) => (
+                                                {allHWSets.map((option) => (
                                                     <MenuItem
-                                                    key={option._id}
-                                                    value={option._id}
+                                                    key={option.HWSetName}
+                                                    value={option.HWSetName}
                                                     >
-                                                        {option.name}
+                                                        {option.HWSetName}
                                                     </MenuItem>
                                                 ))}
                                             </TextField>
@@ -248,17 +348,23 @@ const Projects = () => {
                                             type="number"
                                             placeholder="1"
                                             aria-label="Quantity"
-                                            onChange={e => {setCheckoutQty(e.target.value);}}
+                                            value={checkoutQty}
+                                            onChange={e => {if(e.target.value < 0){
+                                                e.target.value = 0;
+                                            }setCheckoutQty(e.target.value);}}
                                             >
                                             </Input>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <Button>
+                                            <Button
+                                            onClick={() => {handleCheckin(checkoutQty)}}>
                                                 Check In
                                             </Button>
                                         </TableCell>
                                         <TableCell align="center">
-                                            <Button>
+                                            <Button
+                                            type="submit"
+                                            onClick={() => {handleCheckout(checkoutQty)}}>
                                                 Check Out
                                             </Button>
                                         </TableCell>
