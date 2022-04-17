@@ -8,4 +8,4 @@ from server import createApp # imports the createApp function from the server fo
 app = createApp()
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(debug=True)
