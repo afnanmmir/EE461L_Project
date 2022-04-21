@@ -1,3 +1,6 @@
+/**
+ * Component that renders the complete projects page
+ */
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Dialog, DialogContent, Grid, Input, makeStyles, Menu, MenuItem, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar, Snackbar, IconButton } from '@mui/material'; 
 import { Button } from '@mui/material';
@@ -15,41 +18,59 @@ import api from "../httpClient";
 import HardwareSetsTable from "../components/HardwareSetsTable";
 
 const Projects = () => {
+    // state that keeps track of all the projects from the database
     const [allProjects, setAllProjects] = useState([]);
+    // state that keeps track of the current selected project by the user
     const [selectedProject, setSelectedProject] = useState(null);
     const [numProjects, setNumProjects] = useState(0);
     // const [projectName, setProjectName] = useState('');
     // const [projectDescription, setProjectDescription] = useState('');
     // const [projectFunds, setProjectFunds] = useState(0);
+
+    // state that keeps track of the current selected hardware set in the selected project pop up
     const [hwSet, setHwSet] = useState("");
+    // state that keeps track of the amount selected in the check in/out field in selected project pop up
     const [checkoutQty, setCheckoutQty] = useState('');
+    // state that jeeps track of whether the selected project pop up is showing or now
     const [showDialog, setShowDialog] = useState(false);
+    // state that keeps track of all the hardware sets from the database.
     const [allHWSets, setAllHWSets] = useState([]);
+    // state that keeps track of the input in the project ID field.
     const [projectID, setProjectID] = useState('');
+    // state that keeps track of whether the deleted project message is shown or not
     const[showDeleteMessage, setShowDeleteMessage] = useState(false);
+    // state that keeps track of whether the joined project message is shown or not
     const [showJoinSuccess, setShowJoinSuccess] = useState(false);
+    // state that keeps track of whether the failed to join project message is shown or not
     const [showJoinFail, setShowJoinFail] = useState(false)
+    // state that keeps track of the failed to join message
     const [joinFailMessage, setJoinFailMessage] = useState('');
     
     
 
     const handleOpenDialog = () => setShowDialog(true);
+    // function that jandles closing the selected project pop up
     const handleCloseDialog = () => setShowDialog(false);
 
+    // allows the component to navigate to other pages
     const navigate = useNavigate();
+    // Allows component to use the current user information
     const auth = useAuthContext();
     const deleteProjectMessage = "Project successfully deleted.";
     const errorDeleteProjectMessage = "Error in deleting project";
     const joinSuccessMessage = "Joined project successfully";
     
 
-
+    /**
+     * Function that gets all the projects for which the current user is a member of
+     */
     const getUserProjects = () => {
         console.log(auth.user)
         let userEmail = {
             user: auth.user
         }
-        console.log(userEmail)
+        console.log(userEmail);
+        // get request
         api().get("/projects/" + auth.user).then((response) => {
             setAllProjects(response.data.projects);
             console.log(response.data.projects)
@@ -58,7 +79,11 @@ const Projects = () => {
         });
     }
 
+    /**
+     * Function that gets all the hardware sets from the database
+     */
     const getHardwareSets = () => {
+        // get request
         api().get("/hardware/").then((hardwares) => {
             setAllHWSets(hardwares.data)
             console.log(hardwares.data)
@@ -67,8 +92,13 @@ const Projects = () => {
         })
     }
 
+    /**
+     * handles the checkout of hardware for the current selected project
+     * @param {int} qty 
+     */
     const handleCheckout = (qty) => {
         console.log("Hello")
+        // put request to the backend
         api().put("/projects/checkout/"+ selectedProject._id,{
             HWSetName: hwSet,
             amount: qty
@@ -79,7 +109,10 @@ const Projects = () => {
             console.log(e);
         })
     }
-
+    /**
+     * handles the checkin of hardware for the current selected project
+     * @param {int} qty 
+     */
     const handleCheckin = (qty) => {
         api().put("/projects/checkin/"+ selectedProject._id,{
             HWSetName: hwSet,
@@ -91,21 +124,26 @@ const Projects = () => {
             console.log(e);
         })
     }
-
+    /**
+     * Function that handles the current user joining a project
+     * @param {string} projectID 
+     * @param {*} user 
+     */
     const handleJoin = (projectID, user) => {
-        if(projectID !== ''){
+        if(projectID !== ''){ // checks to see if the field is empty or not
+            // put request
             api().put("/projects/members/"+ projectID,{
                 add_or_remove: "add",
                 user_email: user
             }).then((response) => {
-                getUserProjects();
-                setShowJoinSuccess(true);
+                getUserProjects(); // returns the updated user projects
+                setShowJoinSuccess(true); // shows success message
             }).catch((e) => {
                 console.log(e.response);
                 if(e.response.status === 404){
-                    setJoinFailMessage("Error. Project not found.");
+                    setJoinFailMessage("Error. Project not found."); // if no project of inputted id was found
                 }else{
-                    setJoinFailMessage("Error. You have already joined this project.");
+                    setJoinFailMessage("Error. You have already joined this project."); // if already joined
                 }
                 setShowJoinFail(true);
             })
@@ -138,33 +176,55 @@ const Projects = () => {
         }
     ]
 
+    /**
+     * Function that handles showing the popup of the selected project
+     * @param {*} project 
+     */
     const openProject = (project) => {
         setSelectedProject(project);
         setShowDialog(true);
     }
 
+    /**
+     * Function that handles the user deleting one of their projects
+     * @param {*} project the project to be deleted
+     */
     const deleteProject = (project) => {
         let id = project._id;
+        // delete request
         api().delete("/projects/" + id).then((response) => {
             getUserProjects();
             setShowDeleteMessage(true);
         }).catch((e) => {
-            console.log(e);
+            console.log(e); // if delete fails
         })
     }
 
+    /**
+     * Function that handles closing of delete message
+     */
     const handleDeleteMessageClose = () => {
         setShowDeleteMessage(false);
     }
 
+    /**
+     * Function that handles closing the successfully joined message
+     */
     const handleJoinSuccessClose = () => {
         setShowJoinSuccess(false);
     }
 
+    /**
+     * Function that handles closing the failed to join message
+     */
     const handleJoinFailClose = () => {
         setShowJoinFail(false);
     }
 
+    /**
+     * function that returns the react component that renders the set of hardware and information about it for the selected project
+     * @returns the JSX component that renders the hardware set table for the current selected project.
+     */
     const renderHWSetsTable = () =>{
         return(
             <Paper>
@@ -202,6 +262,10 @@ const Projects = () => {
         ) 
     }
 
+    /**
+     * function that returns the react component that renders the set of users and information about it for the selected project
+     * @returns the JSX component that renders the users table for the current selected project.
+     */
     const renderUserTable = () =>{
         return (
             <Paper>
@@ -234,12 +298,17 @@ const Projects = () => {
             </Paper>
         )
     }
+    /**
+     * Rerenders the page when the user of the website changes
+     */
     useEffect(() => {
         getUserProjects();
         getHardwareSets();
         console.log(`all hw sets: ${allProjects}`)
       }, [auth.user]);
-
+    /**
+     * Rerenders page when the set of projects changes in some way
+     */
     useEffect(() => {
         if(allProjects.length !== 0 && selectedProject !== null){
             allProjects.forEach((element) => {

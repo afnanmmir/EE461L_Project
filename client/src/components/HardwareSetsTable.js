@@ -1,3 +1,7 @@
+/**
+ * React component that renders the list of hardware sets available as well as the informtion regarding the
+ * hardware sets
+ */
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Grid, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar } from '@mui/material'; 
 import { Button } from '@mui/material';
@@ -13,16 +17,7 @@ import { Create, Delete } from "@material-ui/icons";
 
 
 const HardwareSetsTable = (props) => {
-    const handleButtonDisable = ({ creator })=>{
-
-    };
-    const isMember = (project) => {
-        return true;
-    }
-
-    const onOpenProject = (project) => {
-        console.log("BUTTON PRESSED");
-    }
+    
 
     
     console.log(`sets: ${props.hwSets}`);

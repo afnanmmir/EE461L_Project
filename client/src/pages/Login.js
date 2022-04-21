@@ -26,7 +26,7 @@ const LoginPage = () => {
     const[showModal, setShowModal] = useState(false);
     // Use the auth object from Authentication.js
     const auth = useAuthContext();
-    const navigate = useNavigate();
+    const navigate = useNavigate(); // allows component to navigate to other pages when necessary
     const style = {
         position: 'absolute',
         top: '50%',
@@ -40,17 +40,20 @@ const LoginPage = () => {
       }; //From React docs
     // RegEx to check for valid email
     const emailRegEx = "^[a-zA-Z0-9+_.-]+@[a-zA-Z0-9.-]+$";
-
+    // handles when the modal should be opened
     const handleOpen = () => setShowModal(true);
+    // handles when the modal should be closed.
     const handleClose = () => setShowModal(false);
     // The login components
     return (
         <div>
+            {/* navigation bar at the top */}
             <Toolbar position="relative">
                 <a href='/'><Button variant='outlined'>Home</Button></a>
                 <a href='/login'><Button variant='outlined'>Log in</Button></a>
                 <a href='/register'><Button variant='outlined'>Sign Up</Button></a>
             </Toolbar>
+            {/* Box contains the log in form */}
             <Box height= "100vh" flex="1" display="flex" justifyContent="center" alignItems= "center"  >
                 <Grid container direction={"column"} spacing={0.75}  align = "center" justify = "center" alignItems = "center">
                     <h2>Sign In</h2>

@@ -1,3 +1,6 @@
+/**
+ * React component to render the form to allow users to create projects
+ */
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Grid, Modal, Paper, Toolbar, Snackbar, IconButton } from '@mui/material';
 import CloseIcon from '@material-ui/icons/Close'; 
@@ -23,25 +26,36 @@ import api from "../httpClient"
 
 const CreateProject = (props) => {
     // const classes = useStyles();
-    const [projectName, setProjectName] = useState("");
-    const [projectDescription, setProjectDescription] = useState("");
-    const [projectFunds, setProjectFunds] = useState("");
-    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false);
-    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false);
-    const [successMessage, setSuccessMessage] = useState("");
-    const [errorMessage, setErrorMessage] = useState("");
+    const [projectName, setProjectName] = useState(""); // state that keeps track of the project name inputted
+    const [projectDescription, setProjectDescription] = useState(""); // state that keeps track of the project description inputted
+    const [projectFunds, setProjectFunds] = useState(""); // state that keeps track of the project funds inputted
+    const [showSuccessSnackbar, setShowSuccessSnackbar] = useState(false); // state that keeps track of whether the success snackbar is showing
+    const [showErrorSnackbar, setShowErrorSnackbar] = useState(false); // state that keeps track of whether the error snackbar is showing
+    const [successMessage, setSuccessMessage] = useState(""); // state that keeps track the success message showing in the snackbar
+    const [errorMessage, setErrorMessage] = useState(""); // state the keeps track of the error message showing in the snackbar
 
-    const auth = useAuthContext();
+    const auth = useAuthContext(); // context object to keep track of current logged in user information
     const success = "Project Created!"
 
+    /**
+     * function used to close the success snackbar
+     */
     const handleSuccessSnackbarClose = () => {
         setShowSuccessSnackbar(false);
     }
 
+    /**
+     * function used to close the error snackbar
+     */
     const handleErrorSnackbarClose = () => {
         setShowErrorSnackbar(false);
     }
 
+    /**
+     * Function to handle the submission of the creation of a project. Checks for valid inputs, then
+     * sends the request to the backend and waits for response from backend. If success message
+     * detected, page rerenders
+     */
     const handleSubmit = () => {
         if(projectName === "" || projectDescription === "" || projectFunds ===""){
             console.log("IM IN HERE")
@@ -82,7 +96,7 @@ const CreateProject = (props) => {
         }}>
         <Grid container direction={"column"} spacing={1} alignContent="center" flexGrow={2}>
             <Grid item>
-                <Typography variant="h5" fontWeight="bold">Create New Project</Typography>
+                <Typography variant="h5" fontWeight="bold">Create New Project</Typography> 
             </Grid>
             <Grid item>
                 <TextField 
@@ -91,7 +105,7 @@ const CreateProject = (props) => {
                 placeholder="Project Name"
                 required
                 value = {projectName}
-                onChange={e => setProjectName(e.target.value)}
+                onChange={e => setProjectName(e.target.value)} 
                 />
             </Grid>
             <Grid item>

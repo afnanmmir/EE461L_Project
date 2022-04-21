@@ -1,3 +1,6 @@
+/**
+ * React component that renders the table of projects of the current user
+ */
 import React, { useEffect, useState } from "react";
 import { AppBar, Box, Grid, Modal, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TableRow, Toolbar } from '@mui/material'; 
 import { Button } from '@mui/material';
@@ -24,6 +27,10 @@ const ProjectTable = (props) => {
         console.log("BUTTON PRESSED");
     }
 
+    /**
+     * Function that handles when the delete button of a project is pressed
+     * @param {*} project the project to be deleted
+     */
     const deleteProjectHandler = (project) =>{
         props.deleteProject(project);
     }
@@ -37,6 +44,7 @@ const ProjectTable = (props) => {
           alignItems: 'center'
       }}>
           <Typography variant="h3" fontWeight="bold">Projects</Typography>
+          {/* contains the table for the projects */}
           <TableContainer component={Paper}>
               <Table aria-label="table">
                 <TableHead>

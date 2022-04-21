@@ -1,3 +1,6 @@
+/**
+ * React component for datasets page of website. Allows user to see information about datasets and download them
+ */
 import React from 'react'
 import Table from '@mui/material/Table';
 import TableBody from '@mui/material/TableBody';
@@ -13,11 +16,18 @@ import Button from '@mui/material/Button'
 import { Toolbar, Box } from '@mui/material';
 import { AuthClass, useAuthContext } from '../Authentication'
 
-
+/**
+ * Helper function to create the datasets table
+ * @param {string} name the name of the dataset
+ * @param {string} description description of the dataset
+ * @param {string} download link for download
+ * @returns 
+ */
 function createData(name, description, download, carbs, protein) {
   return { name, description, download};
 }
 
+// the datasets and their information
 const rows = [
   createData('Abdominal and Direct Fetal ECG Database', 'Multichannel fetal electrocardiogram recordings obtained from 5 different women in labor, between 38 and 41 weeks of gestation.', 'https://physionet.org/static/published-projects/adfecgdb/abdominal-and-direct-fetal-ecg-database-1.0.0.zip'),
   createData('AF Termination Challenge Database','ECG recordings created for the Computers in Cardiology Challenge 2004, which focused on predicting spontaneous termination of atrial fibrillation','https://physionet.org/static/published-projects/aftdb/af-termination-challenge-database-1.0.0.zip'),
@@ -30,7 +40,7 @@ const DataSet = () => {
     // const userEmail = "afnan@gmail.com";
     // const userFirstName = "Afnan";
     // const userLastName = "Mir";
-    const auth = useAuthContext();
+    const auth = useAuthContext(); // contains the information about the current user logged in
     return (
       <div> 
       <Box sx={{ flexGrow: 1 }}>
@@ -41,7 +51,7 @@ const DataSet = () => {
                   </Typography>
                   <Button color="inherit" href='../projects'>Projects</Button>
                   <Button color="inherit" href="../datasets">DataSets</Button>
-                  <Button color="inherit" onClick={() => {auth.logOutUser()}}>Logout</Button>
+                  <Button color="inherit" onClick={() => {auth.logOutUser()}}>Logout</Button> 
               </Toolbar>
           </AppBar>
         </Box>
