@@ -46,11 +46,19 @@ def createApp():
     jwt.init_app(app) # Configure the app with the jwt manager
     mongo.init_app(app) # Configure the app with the PyMongo client instance
 
+    @app.route("/")
+    def home():
+        return app.send_static_file('index.html')
+
+    @app.errorhandler(404)
+    def not_found(e):
+        return app.send_static_file('index.html')
+
     from server.routes.users import users
     from server.routes.hardware import hardware
     from server.routes.projects import projects
     from server.routes.main import main
-    app.register_blueprint(main)
+    # app.register_blueprint(main)
     app.register_blueprint(users, url_prefix='/users')
     app.register_blueprint(hardware, url_prefix='/hardware')
     app.register_blueprint(projects, url_prefix='/projects')
