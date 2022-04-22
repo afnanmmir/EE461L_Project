@@ -13,6 +13,7 @@ import CreateProject from "../components/CreateProject";
 import ProjectTable from "../components/ProjectTable";
 import api from "../httpClient";
 import HardwareSetsTable from "../components/HardwareSetsTable";
+import CreateHardware from "../components/CreateHardware";
 
 const Projects = () => {
     const [allProjects, setAllProjects] = useState([]);
@@ -60,7 +61,7 @@ const Projects = () => {
 
     const getHardwareSets = () => {
         api().get("/hardware/").then((hardwares) => {
-            setAllHWSets(hardwares.data)
+            setAllHWSets(hardwares.data.hardwares)
             console.log(hardwares.data)
         }).catch((e) => {
             console.log(e);
@@ -250,6 +251,11 @@ const Projects = () => {
             })
         }
     },[allProjects])
+
+    useEffect(() => {
+        
+    })
+
     return (
         <div>
             <Box sx={{ flexGrow: 1 }}>
@@ -305,7 +311,15 @@ const Projects = () => {
                     </Box>
                 </Grid>
             </Grid>
-            {allHWSets.length <= 0 ? null : <HardwareSetsTable hwSets={allHWSets}/>}
+            <Grid container direction={"row"} spacing={2}>
+                <Grid item xs={4}>
+                    <CreateHardware getAllHardware={getHardwareSets}/>
+                </Grid>
+                <Grid item xs={8} style={{textAlign: "center"}}>
+                    {allHWSets.length <= 0 ? null : <HardwareSetsTable hwSets={allHWSets}/>}
+                </Grid>
+            </Grid>
+            
                 
                 
             </Box>
