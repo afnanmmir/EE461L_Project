@@ -28,6 +28,7 @@ def create_hardware():
     {
         HWSetName: <string>,
         total_quantity: <int>
+        price: <int>
     }
 
     Parameters
@@ -68,12 +69,14 @@ def create_hardware():
                 "HWSetName": req["HWSetName"],
                 "total_quantity": req["total_quantity"],
                 "available": req["total_quantity"],
-                "checked_out": 0
+                "checked_out": 0,
+                "price_per_unit": req["price"]
             }
             hw_collection.insert_one(doc)
             # print("This worked!")
             return {
-                'message': "Hardware Set Created"
+                'message': "Hardware Set Created",
+                'success': True
             }, 201
 
 @hardware.route('/', methods=["GET"])
@@ -108,6 +111,6 @@ def get_all_hardware():
         }
 
         hw_list.append(hw_dict)
-
-    return jsonify(hw_list), 201
+    
+    return {'hardwares': hw_list}, 201
 
