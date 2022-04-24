@@ -54,3 +54,7 @@ def main():
         assert project['funds'] == 100000
         hw_set = hw_collection.find_one({"HWSetName": "testhardware99"})
         assert int(hw_set["available"]) == 99
+
+    test_add_project()
+    test_checkout()
+    test_checkin()
