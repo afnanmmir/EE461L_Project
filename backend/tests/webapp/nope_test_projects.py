@@ -2,9 +2,9 @@ from pydoc import doc
 from time import sleep
 import pytest
 import requests
-from server import createApp
+from backend.server import createApp
 import pytest_check
-from database.extensions import mongo
+from backend.database.extensions import mongo
 
 def main():
     url = "http://localhost:5000/projects/"

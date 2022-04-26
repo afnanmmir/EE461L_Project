@@ -16,7 +16,7 @@ from flask import Flask
 from dotenv import load_dotenv
 import os
 import datetime
-from database.extensions import * #import the database from database directory
+from backend.database.extensions import * #import the database from database directory
 from flask_cors import CORS # Import CORS class
 from flask_jwt_extended import JWTManager # Import JWTManager Class
 
@@ -46,10 +46,10 @@ def createApp():
     jwt.init_app(app) # Configure the app with the jwt manager
     mongo.init_app(app) # Configure the app with the PyMongo client instance
 
-    from server.routes.users import users
-    from server.routes.hardware import hardware
-    from server.routes.projects import projects
-    from server.routes.main import main
+    from backend.server.routes.users import users
+    from backend.server.routes.hardware import hardware
+    from backend.server.routes.projects import projects
+    from backend.server.routes.main import main
     app.register_blueprint(main)
     app.register_blueprint(users, url_prefix='/users')
     app.register_blueprint(hardware, url_prefix='/hardware')

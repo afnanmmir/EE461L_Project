@@ -7,9 +7,9 @@ from flask_jwt_extended import create_access_token
 import sys
 
 
-from database.extensions import mongo
-from util.JSONEncoder import JSONEncoder
-from util.encryption_module import EncryptionModule
+from backend.database.extensions import mongo
+from backend.util.JSONEncoder import JSONEncoder
+from backend.util.encryption_module import EncryptionModule
 
 users = Blueprint('users', __name__)
 
@@ -50,6 +50,7 @@ def register():
     user = user_collection.find_one({'email':user_email})
     print(f"User is {user}", file=sys.stderr)
 
+    print("testing tests", file=sys.stderr)
     if(user_collection == None):
         encrypted_password = encryption.gen_hashed_password_with_salt(req['passowrd'])
         doc = {
@@ -59,7 +60,6 @@ def register():
                 "password": encrypted_password
             }
         user_collection.insert_one(doc)
-        # print("This worked first time!")
         return {
             'message': "User registered"
         }, 201
@@ -75,7 +75,6 @@ def register():
                 "password": encrypted_password
             }
             user_collection.insert_one(doc)
-            print("This worked!")
             return {
                 'message': "User registered"
             }, 201

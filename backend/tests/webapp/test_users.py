@@ -1,16 +1,44 @@
-from time import sleep
+#from backend.server.routes import users
 import pytest
-import requests
-from server import createApp
 import pytest_check
-from database.extensions import mongo
 
-def main():
+from backend.server import createApp
+from webapp import client
+import json
+
+
+def test_landing(client):
+    landing = client.get("/")
+    assert landing.status_code == 200
+
+
+def test_landing_aliases(client):
+    landing = client.get("/")
+    assert client.get("/").data == landing.data
+
+def test_random(client):
+    data = {
+        'firstName':'testFirst',
+        'lastName': 'testSecond',
+        'password': "testpassword",
+        'email': "test@email.com"
+    }
+    test = client.post("/users/register", json=data)
+    assert 2 == 3
+
+'''
+    Functions in users.py:
+        register()
+        login()
+'''
+
+'''
+class user_tests():
 
     url = "http://localhost:5000/users/"
     app = createApp()
 
-    def test_add_user():
+    def test_register_user():
         user_collection = mongo.db["users"]
         doc = {
             "first_name":"FirstName",
@@ -40,8 +68,5 @@ def main():
         response = requests.post(url = url + "login", data=doc)
         assert response.status_code == 404
     
-    test_add_user()
-    test_fail_log_in()
-    test_log_in()
     
-    
+'''
