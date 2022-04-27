@@ -36,7 +36,7 @@ const LandingPage = () => {
                         Welcome to our app
                     </Typography>
                     <Typography variant="h5" align="center" color="text.secondary" paragraph>
-                        Some words to fill in the space
+                        Create projects, checkout hardware, and download datasets.
                     </Typography>
                     <Stack
                         sx={{ pt:4 }}
