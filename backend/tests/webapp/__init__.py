@@ -1,7 +1,7 @@
 import pytest
 from backend.server import createApp
 
-@pytest.fixture
+@pytest.fixture(scope="session")
 def client():
     '''
     Configures the app for testing
@@ -11,11 +11,6 @@ def client():
     :return: App for testing
     '''
 
-    app = createApp()
+    app = createApp(unit_testing=True)  
     client = app.test_client()
-
     yield client
-
-@pytest.fixture 
-def app(mocker):
-    mocker.patch("")

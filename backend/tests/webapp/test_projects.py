@@ -1,11 +1,8 @@
-from pydoc import doc
-from time import sleep
 import pytest
-import requests
 from backend.server import createApp
 import pytest_check
-from backend.database.extensions import mongo
 
+'''
 def main():
     url = "http://localhost:5000/projects/"
     app = createApp()
@@ -58,3 +55,4 @@ def main():
     test_add_project()
     test_checkout()
     test_checkin()
+'''

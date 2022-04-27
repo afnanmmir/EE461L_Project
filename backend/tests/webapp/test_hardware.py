@@ -1,10 +1,8 @@
-from time import sleep
 import pytest
-import requests
-from server import createApp
+from backend.server import createApp
 import pytest_check
-from backend.database.extensions import mongo
 
+'''
 def main():
     url = "http://localhost:5000/hardware/"
     app = createApp()
@@ -20,3 +18,4 @@ def main():
         assert response.status_code == 201
 
     test_create_hardware()
+'''

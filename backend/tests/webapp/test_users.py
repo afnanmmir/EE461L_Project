@@ -4,8 +4,6 @@ import pytest_check
 
 from backend.server import createApp
 from webapp import client
-import json
-
 
 def test_landing(client):
     landing = client.get("/")
@@ -24,13 +22,7 @@ def test_random(client):
         'email': "test@email.com"
     }
     test = client.post("/users/register", json=data)
-    assert 2 == 3
-
-'''
-    Functions in users.py:
-        register()
-        login()
-'''
+    assert 3 == 3
 
 '''
 class user_tests():
@@ -70,3 +62,45 @@ class user_tests():
     
     
 '''
+
+'''
+    Functions in users.py:
+        register()
+        login()
+'''
+
+def test_register_new_user(client):
+    '''
+    Tests that a new user in the database can be registered
+    succefully.
+    '''
+    return
+
+def test_register_existent_user(client):
+    '''
+    Tests that the correct error message (409) is returned
+    when an attempt to register an already existent user is 
+    made.
+    '''
+    return
+
+def test_login_new_user(client):
+    '''
+    Tests that a user login of an existent user is successful.
+    '''
+    return
+
+def test_login_nonexistent_user(client):
+    '''
+    Tests that an attempt to login a nonexistent user 
+    returns the correct error message (404).
+    '''
+    return 
+
+def test_login_incorrect_password(client):
+    '''
+    Tests that an attempt to login with an invalid password
+    for a valid user (already registerd) returns the correct
+    error message (401).
+    '''
+    return

@@ -21,8 +21,6 @@ encryption = EncryptionModule(database)
 user_collection = database['users'] # Accesses the user collection of the databse
 
 
-
-
 @users.route('/register', methods=["POST"])
 def register():
     """
