@@ -9,6 +9,19 @@ def test_create_new_hardware(client):
     backend api, the hardware set is successfully registered
     in the database. 
     '''
+    create_url = "/hardware/"
+
+    new_hwset = {
+        "HWSetName":"HWSetTest000",
+        "total_quantity":100,
+        "price":10,
+    }
+
+    response = client.post(create_url, json=new_hwset)
+
+    print(response.data, file=sys.stderr)
+    assert response.status_code == 201
+    assert response.data == b'{"message":"Hardware Set Created","success": True}\n'
 
 def test_create_existent_hardware(client):
     '''
@@ -16,7 +29,19 @@ def test_create_existent_hardware(client):
     with a name of an already existent hardware set in the databse
     occurs, we return the appropiate error response (422)
     '''
+    create_url = "/hardware/"
 
+    new_hwset = {
+        "HWSetName":"HWSetTest000",
+        "total_quantity":100,
+        "price":10,
+    }
+
+    response = client.post(create_url, json=new_hwset)
+
+    print(response.data, file=sys.stderr)
+    assert response.status_code == 422
+    assert response.data == b'{"message": "Hardware Set with this name already exists"}\n'
 
 def test_get_all_hardware(client):
     '''
