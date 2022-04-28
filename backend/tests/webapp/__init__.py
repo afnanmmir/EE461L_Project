@@ -1,5 +1,6 @@
 import pytest
 from backend.server import createApp
+from backend.database.extensions import mongo
 
 @pytest.fixture(scope="session")
 def client():
@@ -14,3 +15,15 @@ def client():
     app = createApp(unit_testing=True)  
     client = app.test_client()
     yield client
+
+
+@pytest.fixture(scope="session")
+def database():
+    '''
+    Provides database instance
+
+    :return: Database instance for testing
+    '''
+
+    database = mongo.db
+    yield database

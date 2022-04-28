@@ -1,9 +1,10 @@
 import pytest
 from backend.server import createApp
 import pytest_check
-from webapp import client
+from webapp import client, database
+import sys
 
-def test_create_new_hardware(client):
+def test_create_new_hardware(client, database):
     '''
     Tests that when a new hardware set is sent to the 
     backend api, the hardware set is successfully registered
@@ -23,7 +24,7 @@ def test_create_new_hardware(client):
     assert response.status_code == 201
     assert response.data == b'{"message":"Hardware Set Created","success": True}\n'
 
-def test_create_existent_hardware(client):
+def test_create_existent_hardware(client,database):
     '''
     Tests that when an attempt to register a hardware set
     with a name of an already existent hardware set in the databse
@@ -43,7 +44,7 @@ def test_create_existent_hardware(client):
     assert response.status_code == 422
     assert response.data == b'{"message": "Hardware Set with this name already exists"}\n'
 
-def test_get_all_hardware(client):
+def test_get_all_hardware(client, database):
     '''
     Tests that get all hardware returns the expected hardwares
     sets from database.

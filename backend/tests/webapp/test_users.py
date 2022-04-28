@@ -1,15 +1,19 @@
 import pytest
 import pytest_check
 from backend.server import createApp
-from webapp import client
+from webapp import client, database
 import sys
 
-def test_register_new_user(client):
+
+def test_register_new_user(client, database):
     '''
     Tests that a new user in the database can be registered
     succefully.
     '''
     register_url = "/users/register"
+
+    user_collection = database['users']
+    user_collection.delete_one({'email':'email5@email.com'})
 
     new_user = {
         "firstName":"FirstName500",
@@ -25,7 +29,7 @@ def test_register_new_user(client):
     assert response.data == b'{"message":"User registered"}\n'
 
 
-def test_register_existent_user(client):
+def test_register_existent_user(client, database):
     '''
     Tests that the correct error message (409) is returned
     when an attempt to register an already existent user is 
@@ -33,20 +37,20 @@ def test_register_existent_user(client):
     '''
     return
 
-def test_login_new_user(client):
+def test_login_new_user(client, database):
     '''
     Tests that a user login of an existent user is successful.
     '''
     return
 
-def test_login_nonexistent_user(client):
+def test_login_nonexistent_user(client, database):
     '''
     Tests that an attempt to login a nonexistent user 
     returns the correct error message (404).
     '''
     return 
 
-def test_login_incorrect_password(client):
+def test_login_incorrect_password(client, database):
     '''
     Tests that an attempt to login with an invalid password
     for a valid user (already registerd) returns the correct
