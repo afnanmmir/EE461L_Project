@@ -13,12 +13,12 @@ def test_register_new_user(client, database):
     register_url = "/users/register"
 
     user_collection = database['users']
-    user_collection.delete_one({'email':'email5@email.com'})
+    user_collection.delete_one({'email':'testEmail@email.com'})
 
     new_user = {
-        "firstName":"FirstName500",
-        "lastName":"LastName",
-        "email":"email5@email.com",
+        "firstName":"FirstNameTest",
+        "lastName":"LastNameTest",
+        "email":"testEmail@email.com",
         "password":"password"
     }
 
