@@ -59,9 +59,6 @@ def create_project():
     # Function should give a unique id for the project being created. Would be named 'userEmail_projectName'
     # Function should check to make sure project of given name has not already been created by the user
 
-    # Format the input to json
-    print("MADE IT HERE")
-
     req = request.get_json()
 
     # Obtain the creator's user name (I'm assuming the first name is passed in here)
@@ -156,7 +153,7 @@ def get_projects(userEmail):
             p_temp = p.copy()
             print(project_list, file=sys.stderr)
             project_list.append(p_temp)
-    print("JSON Below")
+
     # print(jsonify(project_list).)
     return {'projects':project_list}, 200
 

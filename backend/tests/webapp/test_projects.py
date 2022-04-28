@@ -114,3 +114,28 @@ def main():
     test_checkout()
     test_checkin()
 '''
+
+def test_create_project():
+    '''
+    Test that a new project created by a valid user
+    is created successfully.
+    '''
+
+def test_create_project_invalid_user():
+    '''
+    Tests that an attempt to create a project by a non
+    existent user, we return the appropiate error (422)
+    '''
+
+def test_create_project_invalid_project_name():
+    '''
+    Tests that an attempt to create a project with 
+    the name of an already existing project returns the
+    appropiate error (422)
+    '''
+
+def test_get_project():
+    '''
+    
+    '''
+
