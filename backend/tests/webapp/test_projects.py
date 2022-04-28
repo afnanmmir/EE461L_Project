@@ -114,6 +114,3 @@ def main():
     test_checkout()
     test_checkin()
 '''
-
-
-def test_
