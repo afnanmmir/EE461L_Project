@@ -15,8 +15,11 @@ def test_create_new_hardware(client, database):
     '''
     create_url = "/hardware/"
 
+    user_collection = database['hardware']
+    user_collection.delete_one({'HWSetName':'HWSetTest001'})
+
     new_hwset = {
-        "HWSetName":"HWSetTest009",
+        "HWSetName":"HWSetTest001",
         "total_quantity":100,
         "price":10,
     }
