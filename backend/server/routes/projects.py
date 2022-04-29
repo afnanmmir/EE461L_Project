@@ -312,7 +312,7 @@ def project_checkin(id):
             break
     
     if(index == -1):
-        return {"message": "Hardware set not found in project list"}, 
+        return {"message": "Hardware set not found in project list"}, 404
     # If we are trying to check in more than what we have checked out, return error
     currently_checked_out = hw_sets[index]["qty"]
     if int(amount) > currently_checked_out:

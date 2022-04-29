@@ -1,7 +1,7 @@
 import pytest
 from backend.server import createApp
 import pytest_check
-from webapp import client
+from webapp import client, database
 
 def test_landing(client):
     landing = client.get("/")
@@ -115,27 +115,99 @@ def main():
     test_checkin()
 '''
 
-def test_create_project():
+def test_create_project(client, database):
     '''
     Test that a new project created by a valid user
     is created successfully.
     '''
 
-def test_create_project_invalid_user():
+def test_create_project_invalid_user(client, database):
     '''
     Tests that an attempt to create a project by a non
-    existent user, we return the appropiate error (422)
+    existent user, we return the appropiate error (422).
     '''
 
-def test_create_project_invalid_project_name():
+def test_create_project_invalid_project_name(client, database):
     '''
     Tests that an attempt to create a project with 
     the name of an already existing project returns the
-    appropiate error (422)
+    appropiate error (422).
     '''
 
-def test_get_project():
+def test_get_projects_valid_user(client, database):
     '''
-    
+    Tests that get_projects returns all projects of a 
+    given valid user email.
+    '''
+
+def test_get_projects_invalid_user(client, database):
+    '''
+    Tests that an attempt to get all projects from a non
+    existent user email returns the appropiate error (422).
+    '''
+
+def test_project_checkout(client, database):
+    '''
+    Tests that checking out a valid amount from a hardware 
+    set from a valid project is successful.
+    '''
+
+def test_project_checkout_invalid_project(client, database):
+    '''
+    '''
+
+def test_project_checkout_invalid_amount(client, database):
+    '''
+    '''
+
+def test_project_checkout_not_enough_funds(client, database):
+    '''
+    '''
+
+def test_project_checkin(client, database):
+    '''
+    '''
+
+def test_project_checkin_invalid_project(client, database):
+    '''
+    '''
+
+def test_project_checkin_invalid_hardware_set(client, database):
+    '''
+    Tests that an attempt to checkin certain amount to a hardware
+    set not part of a project returns the appropiate error (404)
+    '''
+
+def test_project_update_members_add(client, database):
+    '''
+    '''
+
+def test_project_update_members_remove(client, database):
+    '''
+    '''
+
+def test_project_update_members_invalid_input(client, database):
+    '''
+    '''
+
+def test_project_update_members_invalid_project(client, database):
+    '''
+    '''
+
+def test_project_update_members_invalid_user(client, database):
+    '''
+    Tests that an attempt to remove a non existent user 
+    returns the appropiate error (422).
+    '''
+
+def test_delete_project(client, database):
+    '''
+    Tests that deleting an existent project is successful. 
+    '''
+
+def test_delete_project_invalid_project(client, database):
+    '''
+    Tests that an attempt to delete a non existent project returns
+    the appropiate error (404).
     '''
 
