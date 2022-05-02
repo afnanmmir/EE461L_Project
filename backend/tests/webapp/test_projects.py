@@ -2,6 +2,7 @@ import pytest
 from backend.server import createApp
 import pytest_check
 from webapp import client, database
+import sys
 
 def test_landing(client):
     landing = client.get("/")
@@ -19,6 +20,7 @@ def test_random(client):
         'password': "testpassword",
         'email': "test@email.com"
     }
+
     test = client.post("/users/register", json=data)
     assert 3 == 3
 
