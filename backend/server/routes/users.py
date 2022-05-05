@@ -7,9 +7,9 @@ from flask_jwt_extended import create_access_token
 import sys
 
 
-from backend.database.extensions import mongo
-from backend.util.JSONEncoder import JSONEncoder
-from backend.util.encryption_module import EncryptionModule
+from database.extensions import mongo
+from util.JSONEncoder import JSONEncoder
+from util.encryption_module import EncryptionModule
 
 users = Blueprint('users', __name__)
 
