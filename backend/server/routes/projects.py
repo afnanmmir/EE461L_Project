@@ -6,9 +6,9 @@ from flask import jsonify
 import sys
 
 
-from database.extensions import mongo
-from util.JSONEncoder import JSONEncoder
-from util.encryption_module import EncryptionModule
+from backend.database.extensions import mongo
+from backend.util.JSONEncoder import JSONEncoder
+from backend.util.encryption_module import EncryptionModule
 
 projects = Blueprint("projects", __name__)
 
@@ -58,9 +58,6 @@ def create_project():
     # Function requirements:
     # Function should give a unique id for the project being created. Would be named 'userEmail_projectName'
     # Function should check to make sure project of given name has not already been created by the user
-
-    # Format the input to json
-    print("MADE IT HERE")
 
     req = request.get_json()
 
@@ -156,7 +153,7 @@ def get_projects(userEmail):
             p_temp = p.copy()
             print(project_list, file=sys.stderr)
             project_list.append(p_temp)
-    print("JSON Below")
+
     # print(jsonify(project_list).)
     return {'projects':project_list}, 200
 
@@ -315,7 +312,7 @@ def project_checkin(id):
             break
     
     if(index == -1):
-        return {"message": "Hardware set not found in project list"}, 
+        return {"message": "Hardware set not found in project list"}, 404
     # If we are trying to check in more than what we have checked out, return error
     currently_checked_out = hw_sets[index]["qty"]
     if int(amount) > currently_checked_out:
@@ -435,11 +432,11 @@ def project_update_members(id):
         userEmail = user["email"]
 
         # Get list of users from project
-        project = projects_collection.find_one({"id": id})
+        project = projects_collection.find_one({"_id": id})
         userList = project["users"].copy()
         if userEmail in userList:
             userList.remove(userEmail)
-            projects_collection.update_one({"id": id}, {"$set": {"users": userList}})
+            projects_collection.update_one({"_id": id}, {"$set": {"users": userList}})
             return {"message": "User removed from project"}, 201
         else:
             return {"message": "User is not in the project"}, 422

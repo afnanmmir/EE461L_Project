@@ -16,7 +16,7 @@ from flask import Flask
 from dotenv import load_dotenv
 import os
 import datetime
-from database.extensions import * #import the database from database directory
+from backend.database.extensions import * #import the database from database directory
 from flask_cors import CORS # Import CORS class
 from flask_jwt_extended import JWTManager # Import JWTManager Class
 
@@ -25,7 +25,7 @@ jwt = JWTManager()
 
 # from .config import Config
 
-def createApp():
+def createApp(unit_testing=False):
     """
     creates the app with all proper configurations and registers all necessary blueprints for use
 
@@ -39,17 +39,20 @@ def createApp():
     """
     load_dotenv()
     app = Flask(__name__)
-    app.config['MONGO_URI'] = os.getenv('MONGO_URI')
+    if unit_testing:
+        app.config['MONGO_URI'] = os.getenv('MONGO_URI_TESTING')
+    else:
+        app.config['MONGO_URI'] = os.getenv('MONGO_URI')
     app.config['JWT_SECRET_KEY'] = os.getenv('JWT_SECRET_KEY')
     app.config['JWT_ACCESS_TOKEN_EXPIRES'] = datetime.timedelta(days=14)
     cors.init_app(app) # Configure the app with cors instance
     jwt.init_app(app) # Configure the app with the jwt manager
     mongo.init_app(app) # Configure the app with the PyMongo client instance
 
-    from server.routes.users import users
-    from server.routes.hardware import hardware
-    from server.routes.projects import projects
-    from server.routes.main import main
+    from backend.server.routes.users import users
+    from backend.server.routes.hardware import hardware
+    from backend.server.routes.projects import projects
+    from backend.server.routes.main import main
     app.register_blueprint(main)
     app.register_blueprint(users, url_prefix='/users')
     app.register_blueprint(hardware, url_prefix='/hardware')
