@@ -432,11 +432,11 @@ def project_update_members(id):
         userEmail = user["email"]
 
         # Get list of users from project
-        project = projects_collection.find_one({"id": id})
+        project = projects_collection.find_one({"_id": id})
         userList = project["users"].copy()
         if userEmail in userList:
             userList.remove(userEmail)
-            projects_collection.update_one({"id": id}, {"$set": {"users": userList}})
+            projects_collection.update_one({"_id": id}, {"$set": {"users": userList}})
             return {"message": "User removed from project"}, 201
         else:
             return {"message": "User is not in the project"}, 422

@@ -89,6 +89,7 @@ def test_login_new_user(client, database):
         "password":password
     }
 
+
     response = client.post(register_url, json=new_user)
 
     # Define user credentials

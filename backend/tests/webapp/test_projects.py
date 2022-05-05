@@ -172,25 +172,187 @@ def test_project_checkin(client, database):
 
 def test_project_checkin_invalid_project(client, database):
     '''
+    Tests that an attempt to check in to an invalid project 
+    returns the appropiate error (404)
     '''
+    
+    # Set invalid URL with invalid ID of non existent project
+    checkin_url = "/projects/checkin/"
+    invalid_project_id = "invalid_project"
+
+    check_url_invalid_project = checkin_url + invalid_project_id
+
+    # Dictionary to send in request
+    dict = {
+        'HWSetName': "Test",
+        "amount": 50
+    }
+
+    response = client.put(check_url_invalid_project, json=dict)
+
+    # Verify status code and data message
+    assert response.status_code == 404
+    assert response.data == b'{"message":"Project not found"}\n'
 
 def test_project_checkin_invalid_hardware_set(client, database):
     '''
     Tests that an attempt to checkin certain amount to a hardware
     set not part of a project returns the appropiate error (404)
     '''
+    # Create a known project, without a hardware set
+    project_id = "test@email.com_testproject"
+    project = {
+        "_id": project_id,
+        "project_name": "testproject",
+        "description": "test",
+        "creator":"test@email.com",
+        "funds": 100,
+        "users": ["test@email.com"],
+        "hw_sets": [],
+    }
+
+    # Insert known project into database
+    projects_collection = database['projects']
+    if projects_collection.find_one({"project_name":"testproject"}) == None:
+        projects_collection.insert_one(project)
+
+    # Set checkin url with a valid project
+    checkin_url = "/projects/checkin/" + project_id 
+
+    # Dictionary to send in request
+    dict = {
+        'HWSetName': "Test",
+        "amount": 50
+    }
+
+    response = client.put(checkin_url, json=dict)
+
+    # Verify responses
+    assert response.status_code == 404
+    assert response.data == b'{"message":"Hardware set not found in project list"}\n'
+
+
+
 
 def test_project_update_members_add(client, database):
     '''
+    Tests that adding a valid member to a project is successful.
     '''
+    # Create a known project
+    project_id = "test@email.com_testproject"
+    project = {
+        "_id": project_id,
+        "project_name": "testproject",
+        "description": "test",
+        "creator":"test@email.com",
+        "funds": 100,
+        "users": ["test@email.com"],
+        "hw_sets": [],
+    }
+
+    # Insert known project into database
+    projects_collection = database['projects']
+    if projects_collection.find_one({"project_name":"testproject"}) == None:
+        projects_collection.insert_one(project)
+
+    # Update the users list of the project to be empty 
+    projects_collection.update_one({"project_name":"testproject"}, {"$set":{"users":[]}})
+    
+    # Create a known user 
+    new_user_email = "new_email@test.com"
+    user = {
+        "firstName":"FirstNameTest",
+        "lastName":"LastNameTest",
+        "email":new_user_email,
+        "password":"123"
+    }
+
+    # Insert known user into database
+    user_collection = database['users']
+    if user_collection.find_one({"email":new_user_email}) == None:
+        user_collection.insert_one(user)
+
+    update_members_url = "projects/members/" + project_id
+
+    # Set json data to send
+    update_members_dict = {
+        'add_or_remove': 'add',
+        'user_email': new_user_email
+    }
+
+    response = client.put(update_members_url, json=update_members_dict)
+
+    # Verify response
+    assert response.status_code == 201
+    assert response.data == b'{"message":"User successfully added"}\n'
+
+
 
 def test_project_update_members_remove(client, database):
     '''
+    Test that removing a valid member from a project is successful.
     '''
+    # Create a known project
+    project_id = "test@email.com_testproject2"
+    user_email = "test@email.com"
+    
+    project = {
+        "_id": project_id,
+        "project_name": "testproject2",
+        "description": "test",
+        "creator":user_email,
+        "funds": 100,
+        "users": [user_email],
+        "hw_sets": [],
+    }
+
+    # Insert known project into database, if already there, update list of users to have
+    # the user we'll remove
+    projects_collection = database['projects']
+    if projects_collection.find_one({"project_name":"testproject2"}) == None:
+        projects_collection.insert_one(project)
+    else:
+        projects_collection.update_one({"project_name":"testproject2"}, {"$set":{"users":[user_email]}})
+
+
+    # Set json data to send
+    update_members_dict = {
+        'add_or_remove': 'remove',
+        'user_email': user_email
+    }
+
+    update_members_url = "projects/members/" + project_id
+
+    response = client.put(update_members_url, json=update_members_dict)
+
+    # Verify response
+    assert response.status_code == 201
+    assert response.data == b'{"message":"User removed from project"}\n'
+
 
 def test_project_update_members_invalid_input(client, database):
     '''
+    Test that an attempt to update members in a project where the 
+    given input is incorrect (not add or remove)
+    returns appropiate error message (400)
     '''
+    project_id = "test@email.com_testproject2"
+
+    update_members_url = "projects/members/" + project_id
+
+    # Set json data to send
+    update_members_dict = {
+        'add_or_remove': 'test_incorrect_input',
+        'user_email': "notneeded@test.com"
+    }
+
+    response = client.put(update_members_url, json=update_members_dict)
+
+    # Verify error resposne
+    assert response.status_code == 400
+    assert response.data == b'{"message":"Error in updating the project. Invalid Input"}\n'
+
+
 
 def test_project_update_members_invalid_project(client, database):
     '''
